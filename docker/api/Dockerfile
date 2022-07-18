@@ -1,5 +1,5 @@
-FROM node:16.13.1-alpine
-RUN npm i -g @nestjs/cli
+FROM node:16.16.0-alpine
+RUN yarn global add @nestjs/cli
 WORKDIR /work/api
 COPY ./api /work/api/
-CMD ["npm", "run", "start:dev"]
+CMD ["yarn", "run", "start:dev"]
