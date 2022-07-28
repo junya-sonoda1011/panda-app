@@ -9,7 +9,7 @@ import { OrmModule } from './models/orm.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: ['.env', '.env.test'],
     }),
     OrmModule,
   ],
