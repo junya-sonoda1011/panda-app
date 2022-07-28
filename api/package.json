@@ -21,7 +21,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -f src/config/ormconfig.ts",
     "typeorm:migrate": "docker exec api yarn typeorm migration:generate -- -n",
-    "typeorm:run": "docker exec api yarn typeorm migration:run"
+    "typeorm:run": "docker exec api yarn typeorm migration:run",
+    "prod:migrate:run": "yarn typeorm migration:run"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",
