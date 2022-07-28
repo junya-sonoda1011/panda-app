@@ -27,12 +27,8 @@ services:
         target: /var/lib/mysql
         volume:
           nocopy: true
-    environment:
-      MYSQL_ROOT_PASSWORD: "${TYPEORM_PASSWORD}"
-      MYSQL_DATABASE: "${TYPEORM_DATABASE}"
-      MYSQL_USER: "${TYPEORM_USERNAME}"
-      MYSQL_PASSWORD: "${TYPEORM_PASSWORD}"
-    # TYPEORM_HOST はmigration:generate DB_HOST はDB との接続に使用する
-    hostname: "${DB_HOST}"
+    env_file:
+      - api/.dev.env
+    hostname: db
     restart: always
     user: root
