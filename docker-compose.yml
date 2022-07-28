@@ -28,12 +28,7 @@ services:
         volume:
           nocopy: true
     env_file:
-      - ./api/.env
-    environment:
-      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
-      MYSQL_DATABASE: '${DB_DATABASE}'
-      MYSQL_USER: '${DB_USER}'
-      MYSQL_PASSWORD: '${DB_PASSWORD}'
-    hostname: mysql
+      - api/.dev.env
+    hostname: db
     restart: always
     user: root
