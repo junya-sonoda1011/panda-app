@@ -27,11 +27,8 @@ services:
         target: /var/lib/mysql
         volume:
           nocopy: true
-    environment:
-      MYSQL_ROOT_PASSWORD: "${DATABASE_PASSWORD}"
-      MYSQL_DATABASE: "${DATABASE_SCHEMA}"
-      MYSQL_USER: "${DATABASE_USERNAME}"
-      MYSQL_PASSWORD: "${DATABASE_PASSWORD}"
-    hostname: "${DATABASE_HOST}"
+    env_file:
+      - api/.dev.env
+    hostname: db
     restart: always
     user: root

@@ -19,16 +19,16 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -f src/models/ormconfig.ts",
-    "typeorm:migrate": "yarn typeorm migration:generate -- -n",
-    "typeorm:run": "yarn typeorm migration:run"
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -f src/config/ormconfig.ts",
+    "typeorm:migrate": "docker exec api yarn typeorm migration:generate -- -n",
+    "typeorm:run": "docker exec api yarn typeorm migration:run"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",
-    "@nestjs/config": "^2.2.0",
     "@nestjs/core": "^8.0.0",
     "@nestjs/platform-express": "^8.0.0",
     "@nestjs/typeorm": "^8.0.0",
+    "dotenv": "^16.0.1",
     "mysql": "^2.18.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
