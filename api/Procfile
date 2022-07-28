@@ -1,1 +1,2 @@
+release: yarn typeorm:run
 web yarn run start:prod
