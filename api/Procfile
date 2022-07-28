@@ -1,2 +1,2 @@
-release: prod:migrate:run
+release: yarn prod:migrate:run
 web yarn run start:prod
