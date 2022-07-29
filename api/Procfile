@@ -1,2 +1,2 @@
-release: yarn prod:migrate:run
+release: yarn typeorm:run:prod
 web yarn run start:prod
