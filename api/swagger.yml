@@ -1,0 +1,79 @@
+openapi: 3.0.0
+info:
+  title: 'panda-app API'
+  description: 'panda-app のAPI を定義'
+  version: '1.0.0'
+servers:
+  - url: https://panda-app-api.herokuapp.com/
+    description: 本番環境のURL
+tags:
+  - name: 'auth'
+  - name: 'users'
+  - name: 'meal_records'
+  - name: 'unit_calculations'
+
+paths:
+  /users:
+    post:
+      tags:
+        - 'users'
+      summary: 'ユーザー登録'
+      description: 'ユーザーを登録する'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: ユーザー名
+                work:
+                  type: string
+                  description: ユーザーの職業
+                hobby:
+                  type: string
+                  description: ユーザーの趣味
+                password:
+                  type: string
+                  description: パスワード
+      responses:
+        '200':
+          description: '正常応答'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: 処理のメッセージが入ります。
+  /users/{usersId}:
+    get:
+      tags:
+        - 'users'
+      summary: 'ユーザー情報取得'
+      description: 'userId で指定したユーザー情報を取得する'
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: '正常応答'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: ユーザー名
+                  work:
+                    type: string
+                    description: ユーザーの職業
+                  hobby:
+                    type: string
+                    description: ユーザーの趣味
