@@ -1,0 +1,645 @@
+openapi: 3.0.0
+info:
+  title: 'panda-app API'
+  description: 'panda-app のAPI を定義'
+  version: 1.0.0
+servers:
+  - url: https://panda-app-api.herokuapp.com/
+    description: 本番環境のURL
+
+tags:
+  - name: 'auth'
+  - name: 'users'
+  - name: 'admins'
+  - name: 'meal-records'
+  - name: 'snacks'
+
+paths:
+  /auth/users/login:
+    post:
+      tags:
+        - 'auth'
+      summary: 'ユーザーログイン'
+      description: 'name/PW でユーザー認証を行う'
+      requestBody:
+        $ref: '#/components/requestBodies/login'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /auth/users/sign-up:
+    post:
+      tags:
+        - 'auth'
+      summary: 'ユーザー登録'
+      description: 'ユーザーを登録する'
+      requestBody:
+        $ref: '#/components/requestBodies/usersSignUp'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /auth/users/logout:
+    post:
+      tags:
+        - 'auth'
+      summary: 'ユーザーログアウト'
+      description: 'ユーザーのセッションをクリアする'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /auth/admins/login:
+    post:
+      tags:
+        - 'auth'
+      summary: '管理者ログイン'
+      description: 'name/PW で管理者認証を行う'
+      requestBody:
+        $ref: '#/components/requestBodies/login'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /auth/admins/sign-up:
+    post:
+      tags:
+        - 'auth'
+      summary: '管理者登録'
+      description: '管理者を登録する'
+      requestBody:
+        $ref: '#/components/requestBodies/adminSignUp'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /auth/admins/logout:
+    post:
+      tags:
+        - 'auth'
+      summary: '管理者ログアウト'
+      description: '管理者のセッションをクリアする'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /users/me:
+    get:
+      tags:
+        - 'users'
+      summary: 'ログインユーザー情報取得'
+      description: 'ログインユーザーの情報を取得する'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - 'users'
+      summary: 'ログインユーザー情報更新'
+      description: 'userId で指定したユーザー情報を更新する'
+      requestBody:
+        $ref: '#/components/requestBodies/usersSignUp'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /users:
+    get:
+      tags:
+        - 'users'
+      summary: 'ユーザー一覧取得'
+      description: '登録済みのユーザー一覧を取得'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /users/{userId}:
+    get:
+      tags:
+        - 'users'
+      summary: 'ユーザー情報取得'
+      description: 'userId で指定した登録済みのユーザー情報を取得する'
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - 'users'
+      summary: 'ユーザー情報更新'
+      description: 'userId で指定したユーザー情報を更新する'
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      requestBody:
+        $ref: '#/components/requestBodies/usersSignUp'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - 'users'
+      summary: 'ユーザー情報削除'
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      description: 'userId で指定したユーザー情報を削除する'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admins/me:
+    get:
+      tags:
+        - 'admins'
+      summary: '管理者情報取得'
+      description: 'ログインしている管理者の情報を取得する'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # TODO:管理者がユーザーを条件に食事記録を検索する機能検討する
+  # /meal-records:
+  #   get:
+  #     tags:
+  #       - 'meal-records'
+  #     summary: '全ユーザー食事記録一覧取得'
+  #     description: '全ユーザーの食事記録一覧を取得する'
+  #     responses:
+  #       '200':
+  #         $ref: '#/components/responses/OK'
+  #       '401':
+  #         $ref: '#/components/responses/Unauthorized'
+  #       '404':
+  #         $ref: '#/components/responses/NotFound'
+  #       '500':
+  #         $ref: '#/components/responses/InternalServerError'
+  # /meal-records/{mealRecordId}:
+  #   get:
+  #     tags:
+  #       - 'meal-records'
+  #     summary: '食事記録一覧取得'
+  #     description: 'ログインユーザーの食事記録一覧を取得する'
+  #     parameters:
+  #       - $ref: '#/components/parameters/mealRecordId'
+  #     responses:
+  #       '200':
+  #         $ref: '#/components/responses/OK'
+  #       '401':
+  #         $ref: '#/components/responses/Unauthorized'
+  #       '404':
+  #         $ref: '#/components/responses/NotFound'
+  #       '500':
+  #         $ref: '#/components/responses/InternalServerError'
+  /meal-records/me:
+    post:
+      tags:
+        - 'meal-records'
+      summary: '食事記録保存'
+      description: 'ログインユーザーの食事記録を保存する'
+      requestBody:
+        $ref: '#/components/requestBodies/mealRecord'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    get:
+      tags:
+        - 'meal-records'
+      summary: '食事記録一覧取得'
+      description: 'ログインユーザーの食事記録一覧を取得する'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /meal-records/me/{mealRecordId}:
+    get:
+      tags:
+        - 'meal-records'
+      summary: '食事記録一覧取得'
+      description: 'ログインユーザーの食事記録一覧を取得する'
+      parameters:
+        - $ref: '#/components/parameters/mealRecordId'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - 'meal-records'
+      summary: '食事記録更新'
+      description: 'ログインユーザーの食事記録を更新する'
+      parameters:
+        - $ref: '#/components/parameters/mealRecordId'
+      requestBody:
+        $ref: '#/components/requestBodies/mealRecord'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - 'meal-records'
+      summary: '食事記録削除'
+      description: 'ログインユーザーの食事記録を削除する'
+      parameters:
+        - $ref: '#/components/parameters/mealRecordId'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /snacks:
+    get:
+      tags:
+        - 'snacks'
+      summary: '菓子情報一覧取得'
+      description: '登録済みの菓子一覧を取得する'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /snacks/{snackId}:
+    post:
+      tags:
+        - 'snacks'
+      summary: '菓子情報登録'
+      description: 'snackId で指定した菓子情報を登録する'
+      parameters:
+        - $ref: '#/components/parameters/snackId'
+      requestBody:
+        $ref: '#/components/requestBodies/snack'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    get:
+      tags:
+        - 'snacks'
+      summary: '菓子情報取得'
+      description: 'snackId で指定した登録済みの菓子情報を取得する'
+      parameters:
+        - $ref: '#/components/parameters/snackId'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - 'snacks'
+      summary: '菓子情報更新'
+      description: 'snackId で指定した菓子情報を更新する'
+      parameters:
+        - $ref: '#/components/parameters/snackId'
+      requestBody:
+        $ref: '#/components/requestBodies/snack'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - 'snacks'
+      summary: '菓子情報削除'
+      description: 'snackId で指定したユーザー情報を削除する'
+      parameters:
+        - $ref: '#/components/parameters/snackId'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  # TODO 菓子情報を食品成分表から一括インポートする機能検討する
+  # /snacks/csv:
+  #   post:
+  #     tags:
+  #       - 'snacks'
+  #     summary: '菓子情報CSV インポート'
+  #     description: '菓子情報をCSV インポートする'
+  #     requestBody:
+  #       $ref: '#/components/requestBodies/import-csv'
+  #     parameters:
+  #       - $ref: '#/components/parameters/snackId'
+  #     responses:
+  #       '200':
+  #         $ref: '#/components/responses/OK'
+  #       '400':
+  #         $ref: '#/components/responses/BadRequest'
+  #       '401':
+  #         $ref: '#/components/responses/Unauthorized'
+  #       '404':
+  #         $ref: '#/components/responses/NotFound'
+  #       '500':
+  #         $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    token:
+      type: apiKey
+      description: ヘッダに乗せるシークレットキー
+      in: header
+      name: Authorization
+
+  parameters:
+    userId:
+      in: path
+      name: userId
+      required: true
+      schema:
+        type: string
+    snackId:
+      in: path
+      name: snackId
+      required: true
+      schema:
+        type: string
+    mealRecordId:
+      in: path
+      name: mealRecordId
+      required: true
+      schema:
+        type: string
+
+  requestBodies:
+    login:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: ユーザー名
+              password:
+                type: string
+                description: パスワード
+    usersSignUp:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: ユーザー名
+              work:
+                type: string
+                description: ユーザーの職業
+              hobby:
+                type: string
+                description: ユーザーの趣味
+              password:
+                type: string
+                description: パスワード
+    adminSignUp:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: 管理者名
+              password:
+                type: string
+                description: パスワード
+    mealRecord:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: 'object'
+              properties:
+                snackId:
+                  type: 'integer'
+                  example: 1
+                unitIntake:
+                  type: 'integer'
+                  example: 2
+    snack:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              snackId:
+                type: integer
+                example: 1
+              name:
+                type: string
+                description: 菓子名称
+                example: シュークリーム
+              standardEnergy:
+                type: integer
+                description: 基準エネルギー量
+                example: 211
+              standardWeight:
+                type: integer
+                description: 単位重量
+                example: 100
+              unitWeight:
+                type: integer
+                description: 単位重量
+                example: 75
+              displayName:
+                type: string
+                description: 菓子表示名
+                example: シュークリーム
+              unitAndStandardWeightRatio:
+                type: integer
+                description: 単位基準重量比
+                example: 0.75
+    import-csv:
+      content:
+        text/csv:
+          schema:
+            type: string
+            description: CSV ファイル
+            example: m_snack_data.csv
+
+  responses:
+    OK:
+      description: 正常応答
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/message'
+    BadRequest:
+      description: 入力エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/messages'
+    Unauthorized:
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/message'
+    Forbidden:
+      description: 権限エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/message'
+    NotFound:
+      description: データなし
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/message'
+    InternalServerError:
+      description: サーバー内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/message'
+  schemas:
+    # common
+    message:
+      type: object
+      properties:
+        message:
+          type: string
+          description: メッセージ
+          example: 処理のメッセージが入ります。
+
+    messages:
+      type: array
+      items:
+        type: 'object'
+        properties:
+          message:
+            type: 'string'
+            example: 処理のメッセージが入ります。
