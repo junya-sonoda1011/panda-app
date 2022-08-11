@@ -301,8 +301,8 @@ paths:
     get:
       tags:
         - 'meal-records'
-      summary: '食事記録一覧取得'
-      description: 'ログインユーザーの食事記録一覧を取得する'
+      summary: '食事記録取得'
+      description: 'ログインユーザーの食事記録を取得する'
       parameters:
         - $ref: '#/components/parameters/mealRecordId'
       responses:
