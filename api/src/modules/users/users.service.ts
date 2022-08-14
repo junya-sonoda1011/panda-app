@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { SaveUserDto } from 'src/controller/users/dto/save-user.dto';
 import { User } from 'src/models/entities/user.entity';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -11,14 +12,27 @@ export class UsersService {
     private readonly user: Repository<User>,
   ) {}
 
-  async save(body: SaveUserDto): Promise<void> {
+  async save(body: SaveUserDto): Promise<User> {
+    body.password = await bcrypt.hash(body.password, await bcrypt.genSalt());
     const saveData = new UserData4Save(body);
-    await this.user.save(saveData);
+    return await this.user.save(saveData);
   }
 
   async findById(userId: string): Promise<User> {
-    const user = await this.user.findOne({ where: { id: userId } });
-    return user;
+    return await this.user.findOne({ where: { id: userId } });
+  }
+
+  async findByName(userName: string): Promise<User> {
+    return await this.user.findOne({ where: { name: userName } });
+  }
+
+  async findByPayload(payload: {
+    id: string;
+    username: string;
+  }): Promise<User> {
+    return await this.user.findOne({
+      where: { id: payload.id, name: payload.username },
+    });
   }
 }
 
@@ -26,6 +40,7 @@ export class UserData4Save {
   name: string;
   work: string;
   hobby: string;
+  password: string;
   createdAt: string;
   updatedAt: string;
 
@@ -33,5 +48,6 @@ export class UserData4Save {
     this.name = data.name;
     this.work = data.work;
     this.hobby = data.hobby;
+    this.password = data.password;
   }
 }

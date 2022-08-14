@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Base } from './base.abstract-entity';
 import { MealRecord } from './meal_record.entity';
@@ -42,6 +43,16 @@ export class User extends Base {
     comment: '趣味',
   })
   hobby: string;
+
+  /** パスワード */
+  @Column({
+    type: 'varchar',
+    name: 'password',
+    length: 255,
+    comment: 'パスワード',
+  })
+  @Exclude({ toPlainOnly: true })
+  password: string;
 
   /** 食事記録リレーション */
   @OneToMany(() => MealRecord, (mealRecord) => mealRecord.user)
