@@ -4,7 +4,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersService } from '../users/users.service';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
-import { User } from 'src/models/entities/user.entity';
+import { User } from '../../models/entities/user.entity';
 
 const env = process.env.NODE_ENV || 'dev';
 const dotenv_path = path.resolve(process.cwd(), `.${env}.env`);

@@ -1,4 +1,4 @@
-import { User } from 'src/models/entities/user.entity';
+import { User } from '../../../models/entities/user.entity';
 
 export class UserResponse {
   name: string;
