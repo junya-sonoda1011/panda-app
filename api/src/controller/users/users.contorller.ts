@@ -7,11 +7,11 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { User } from 'src/models/entities/user.entity';
+import { User } from '../../models/entities/user.entity';
 
-import { UsersService } from 'src/modules/users/users.service';
-import { CurrentUser } from 'src/utils/decorators/current-user.decorator';
-import { JwtAuthGuard } from 'src/utils/guards/jwt-auth.guard';
+import { UsersService } from '../../modules/users/users.service';
+import { CurrentUser } from '../../utils/decorators/current-user.decorator';
+import { JwtAuthGuard } from '../../utils/guards/jwt-auth.guard';
 
 import { UserResponse } from './response/find-user.response';
 

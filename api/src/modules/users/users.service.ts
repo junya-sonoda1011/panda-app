@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SaveUserDto } from 'src/controller/users/dto/save-user.dto';
-import { User } from 'src/models/entities/user.entity';
+import { SaveUserDto } from '../../controller/users/dto/save-user.dto';
+import { User } from '../../models/entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
@@ -36,7 +36,7 @@ export class UsersService {
   }
 }
 
-export class UserData4Save {
+class UserData4Save {
   name: string;
   work: string;
   hobby: string;

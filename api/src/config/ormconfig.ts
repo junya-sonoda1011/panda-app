@@ -19,8 +19,8 @@ export const ormConfig: ConnectionOptions = {
   entities: ['dist/models/entities/*.entity.js'],
   migrations: ['dist/models/migrations/*.js'],
   cli: {
-    entitiesDir: 'src/models/entities',
-    migrationsDir: 'src/models/migrations',
+    entitiesDir: '../models/entities',
+    migrationsDir: '../models/migrations',
   },
 };
 
