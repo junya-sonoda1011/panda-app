@@ -11,7 +11,7 @@ import * as dotenv from 'dotenv';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtAuthGuard } from '../../utils/guards/jwt-auth.guard';
 
-const env = process.env.NODE_ENV || 'dev';
+const env = process.env.ENV || 'dev';
 const dotenv_path = path.resolve(process.cwd(), `.${env}.env`);
 const result = dotenv.config({ path: dotenv_path });
 if (result.error) {
