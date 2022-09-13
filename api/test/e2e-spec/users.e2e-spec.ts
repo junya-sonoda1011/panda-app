@@ -7,9 +7,12 @@ import {
 } from '../test-global.module';
 import * as request from 'supertest';
 import { AuthControllerModule } from '../../src/controller/auth/auth.controller.module';
+import { seed } from '../../src/models/seed/seed';
+import { Connection } from 'typeorm';
 
 describe('UsersController', () => {
   let app: INestApplication;
+  let connection;
   let accessToken;
 
   beforeAll(async () => {
@@ -20,9 +23,12 @@ describe('UsersController', () => {
     app = moduleRef.createNestApplication();
 
     app.useGlobalPipes(new ValidationPipe(testValidationPipeOptions));
+    connection = moduleRef.get<Connection>(Connection);
 
     await app.init();
     await app.getHttpAdapter().getInstance();
+
+    await seed(connection);
 
     const res = await request(app.getHttpServer()).post('/auth/login').send({
       name: 'testUser',
