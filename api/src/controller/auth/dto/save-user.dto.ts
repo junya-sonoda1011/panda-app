@@ -5,11 +5,9 @@ export class SaveUserDto {
   @IsString()
   name: string;
 
-  @IsNotEmpty()
   @IsString()
   work: string;
 
-  @IsNotEmpty()
   @IsString()
   hobby: string;
 
