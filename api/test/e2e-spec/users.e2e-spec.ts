@@ -13,7 +13,7 @@ import { Connection } from 'typeorm';
 describe('UsersController', () => {
   let app: INestApplication;
   let connection;
-  let accessToken;
+  let token;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -35,48 +35,36 @@ describe('UsersController', () => {
       password: 'test1234',
     });
 
-    accessToken = Object.values(JSON.parse(res.text));
+    token = Object.values(JSON.parse(res.text));
   });
 
   afterAll(async () => {
     await app.close();
   });
-  describe('GET /users/:userId', () => {
-    const normalCases = [
-      {
-        msg: '正常系',
-        id: '1',
-        expected: {
-          status: 200,
-          data: {
-            name: 'testUser',
-            work: 'work1',
-            hobby: 'hobby1',
-          },
-        },
-      },
-    ];
-    describe.each(normalCases)('正常系', ({ msg, id, expected }) => {
-      it(msg, async () => {
-        await request(app.getHttpServer())
-          .get(`/users/${id}`)
-          .set('Authorization', 'Bearer ' + accessToken)
-          .expect(expected.status)
-          .expect(expected.data);
-      });
-    });
-  });
+
+  const response = {
+    name: 'testUser',
+    work: 'work1',
+    hobby: 'hobby1',
+  };
+
+  const unauthorizedResponse = {
+    statusCode: 401,
+    message: 'Unauthorized',
+  };
+
+  const notFoundResponse = {
+    statusCode: 404,
+    message: 'Not Found',
+  };
+
   describe('GET /users/me', () => {
     const normalCases = [
       {
-        msg: '正常系',
+        msg: 'ログインユーザーの情報取得',
         expected: {
           status: 200,
-          data: {
-            name: 'testUser',
-            work: 'work1',
-            hobby: 'hobby1',
-          },
+          data: response,
         },
       },
     ];
@@ -84,10 +72,87 @@ describe('UsersController', () => {
       it(msg, async () => {
         await request(app.getHttpServer())
           .get('/users/me')
-          .set('Authorization', 'Bearer ' + accessToken)
+          .set('Authorization', 'Bearer ' + token)
           .expect(expected.status)
           .expect(expected.data);
       });
     });
+
+    const semiNormalCases = [
+      {
+        msg: 'accessToken が不正',
+        expected: {
+          status: 401,
+          data: unauthorizedResponse,
+        },
+      },
+    ];
+    describe.each(semiNormalCases)('異常系', ({ msg, expected }) => {
+      it(msg, async () => {
+        await request(app.getHttpServer())
+          .get('/users/me')
+          .set('Authorization', 'Bearer ' + 'invalidToken')
+          .expect(expected.status)
+          .expect(expected.data);
+      });
+    });
+  });
+
+  describe('GET /users/:userId', () => {
+    const normalCases = [
+      {
+        msg: '指定したID のユーザー情報取得',
+        id: '1',
+        expected: {
+          status: 200,
+          data: response,
+        },
+      },
+    ];
+    describe.each(normalCases)('正常系', ({ msg, id, expected }) => {
+      it(msg, async () => {
+        await request(app.getHttpServer())
+          .get(`/users/${id}`)
+          .set('Authorization', 'Bearer ' + token)
+          .expect(expected.status)
+          .expect(expected.data);
+      });
+    });
+
+    const semiNormalCases = [
+      {
+        msg: '存在しないユーザーID',
+        id: '2',
+        isValidToken: true,
+        expected: {
+          status: 404,
+          data: notFoundResponse,
+        },
+      },
+      {
+        msg: 'accessToken が不正',
+        id: '1',
+        isValidToken: false,
+        expected: {
+          status: 401,
+          data: unauthorizedResponse,
+        },
+      },
+    ];
+    describe.each(semiNormalCases)(
+      '異常系',
+      ({ msg, id, isValidToken, expected }) => {
+        it(msg, async () => {
+          await request(app.getHttpServer())
+            .get(`/users/${id}`)
+            .set(
+              'Authorization',
+              isValidToken ? 'Bearer ' + token : 'Bearer ' + 'invalidToken',
+            )
+            .expect(expected.status)
+            .expect(expected.data);
+        });
+      },
+    );
   });
 });

@@ -33,6 +33,18 @@ describe('AuthController', () => {
     await app.close();
   });
 
+  const badRequestResponse = {
+    statusCode: 400,
+    message: [],
+    error: 'Bad Request',
+  };
+
+  const unauthorizedResponse = {
+    statusCode: 401,
+    message: 'ユーザー名またはパスワードを確認してください',
+    error: 'Unauthorized',
+  };
+
   describe('POST /signup', () => {
     const signupRequestBody = {
       name: 'testUser1',
@@ -68,6 +80,10 @@ describe('AuthController', () => {
         },
         expected: {
           status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['name must be a string'] },
+          },
         },
       },
       {
@@ -78,6 +94,10 @@ describe('AuthController', () => {
         },
         expected: {
           status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['work must be a string'] },
+          },
         },
       },
       {
@@ -88,6 +108,10 @@ describe('AuthController', () => {
         },
         expected: {
           status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['hobby must be a string'] },
+          },
         },
       },
       {
@@ -98,6 +122,10 @@ describe('AuthController', () => {
         },
         expected: {
           status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['password must be a string'] },
+          },
         },
       },
       {
@@ -108,6 +136,10 @@ describe('AuthController', () => {
         },
         expected: {
           status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['name must be a string'] },
+          },
         },
       },
       {
@@ -118,6 +150,10 @@ describe('AuthController', () => {
         },
         expected: {
           status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['work must be a string'] },
+          },
         },
       },
       {
@@ -128,6 +164,10 @@ describe('AuthController', () => {
         },
         expected: {
           status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['hobby must be a string'] },
+          },
         },
       },
       {
@@ -138,6 +178,10 @@ describe('AuthController', () => {
         },
         expected: {
           status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['password must be a string'] },
+          },
         },
       },
       {
@@ -148,6 +192,10 @@ describe('AuthController', () => {
         },
         expected: {
           status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['name should not be empty'] },
+          },
         },
       },
       {
@@ -158,6 +206,10 @@ describe('AuthController', () => {
         },
         expected: {
           status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['password should not be empty'] },
+          },
         },
       },
       {
@@ -165,6 +217,19 @@ describe('AuthController', () => {
         requestBody: {},
         expected: {
           status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{
+              message: [
+                'name must be a string',
+                'name should not be empty',
+                'work must be a string',
+                'hobby must be a string',
+                'password must be a string',
+                'password should not be empty',
+              ],
+            },
+          },
         },
       },
       {
@@ -175,6 +240,10 @@ describe('AuthController', () => {
         },
         expected: {
           status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['property unknownKey should not exist'] },
+          },
         },
       },
     ];
@@ -185,7 +254,8 @@ describe('AuthController', () => {
           await request(app.getHttpServer())
             .post('/auth/signup')
             .send(requestBody)
-            .expect(expected.status);
+            .expect(expected.status)
+            .expect(expected.data);
         });
       },
     );
@@ -223,6 +293,7 @@ describe('AuthController', () => {
         },
         expected: {
           status: 401,
+          data: unauthorizedResponse,
         },
       },
       {
@@ -233,6 +304,7 @@ describe('AuthController', () => {
         },
         expected: {
           status: 401,
+          data: unauthorizedResponse,
         },
       },
       {
@@ -243,6 +315,7 @@ describe('AuthController', () => {
         },
         expected: {
           status: 401,
+          data: unauthorizedResponse,
         },
       },
       {
@@ -253,6 +326,10 @@ describe('AuthController', () => {
         },
         expected: {
           status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['name must be a string'] },
+          },
         },
       },
       {
@@ -263,6 +340,10 @@ describe('AuthController', () => {
         },
         expected: {
           status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['password must be a string'] },
+          },
         },
       },
       {
@@ -273,6 +354,10 @@ describe('AuthController', () => {
         },
         expected: {
           status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['name must be a string'] },
+          },
         },
       },
       {
@@ -283,6 +368,10 @@ describe('AuthController', () => {
         },
         expected: {
           status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['password must be a string'] },
+          },
         },
       },
       {
@@ -290,6 +379,17 @@ describe('AuthController', () => {
         requestBody: {},
         expected: {
           status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{
+              message: [
+                'name should not be empty',
+                'name must be a string',
+                'password should not be empty',
+                'password must be a string',
+              ],
+            },
+          },
         },
       },
       {
@@ -300,6 +400,10 @@ describe('AuthController', () => {
         },
         expected: {
           status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['property unknownKey should not exist'] },
+          },
         },
       },
     ];
@@ -310,7 +414,8 @@ describe('AuthController', () => {
           await request(app.getHttpServer())
             .post('/auth/login')
             .send(requestBody)
-            .expect(expected.status);
+            .expect(expected.status)
+            .expect(expected.data);
         });
       },
     );
