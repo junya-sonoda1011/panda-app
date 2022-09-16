@@ -1,4 +1,10 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  InternalServerErrorException,
+  Post,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthService } from '../../modules/auth/auth.service';
 import { SaveUserDto } from './dto/save-user.dto';
 import { AuthDto } from './dto/auth.dto';
@@ -14,6 +20,18 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() authDto: AuthDto) {
-    return await this.authService.login(authDto);
+    try {
+      return await this.authService.login(authDto);
+    } catch (e) {
+      console.log(e instanceof UnauthorizedException);
+
+      if (e instanceof UnauthorizedException) {
+        throw new UnauthorizedException(
+          'ユーザー名またはパスワードを確認してください',
+        );
+      } else {
+        throw new InternalServerErrorException();
+      }
+    }
   }
 }

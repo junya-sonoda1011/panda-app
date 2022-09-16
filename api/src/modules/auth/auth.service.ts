@@ -29,8 +29,6 @@ export class AuthService {
 
       return { accessToken };
     }
-    throw new UnauthorizedException(
-      'ユーザー名またはパスワードを確認してください',
-    );
+    throw new UnauthorizedException();
   }
 }
