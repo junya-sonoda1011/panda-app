@@ -1,17 +1,32 @@
 import { IsNotEmpty, IsString } from 'class-validator';
+import { classValidatorMessages } from '../../../utils/validators/class-validator-messages';
+
+const { isNotEmpty, isString } = classValidatorMessages;
 
 export class SaveUserDto {
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({
+    message: isNotEmpty,
+  })
+  @IsString({
+    message: isString,
+  })
   name: string;
 
-  @IsString()
+  @IsString({
+    message: isString,
+  })
   work: string;
 
-  @IsString()
+  @IsString({
+    message: isString,
+  })
   hobby: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({
+    message: isNotEmpty,
+  })
+  @IsString({
+    message: isString,
+  })
   password: string;
 }

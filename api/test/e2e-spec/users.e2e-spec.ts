@@ -50,12 +50,14 @@ describe('UsersController', () => {
 
   const unauthorizedResponse = {
     statusCode: 401,
-    message: 'Unauthorized',
+    message: 'ログインしてください',
+    error: 'Unauthorized',
   };
 
   const notFoundResponse = {
     statusCode: 404,
-    message: 'Not Found',
+    message: '指定されたID のユーザーが存在しません',
+    error: 'Not Found',
   };
 
   describe('GET /users/me', () => {
