@@ -82,7 +82,7 @@ describe('AuthController', () => {
           status: 400,
           data: {
             ...badRequestResponse,
-            ...{ message: ['name must be a string'] },
+            ...{ message: ['name はstring を入力してください'] },
           },
         },
       },
@@ -96,7 +96,7 @@ describe('AuthController', () => {
           status: 400,
           data: {
             ...badRequestResponse,
-            ...{ message: ['work must be a string'] },
+            ...{ message: ['work はstring を入力してください'] },
           },
         },
       },
@@ -110,7 +110,7 @@ describe('AuthController', () => {
           status: 400,
           data: {
             ...badRequestResponse,
-            ...{ message: ['hobby must be a string'] },
+            ...{ message: ['hobby はstring を入力してください'] },
           },
         },
       },
@@ -124,7 +124,7 @@ describe('AuthController', () => {
           status: 400,
           data: {
             ...badRequestResponse,
-            ...{ message: ['password must be a string'] },
+            ...{ message: ['password はstring を入力してください'] },
           },
         },
       },
@@ -138,7 +138,7 @@ describe('AuthController', () => {
           status: 400,
           data: {
             ...badRequestResponse,
-            ...{ message: ['name must be a string'] },
+            ...{ message: ['name はstring を入力してください'] },
           },
         },
       },
@@ -152,7 +152,7 @@ describe('AuthController', () => {
           status: 400,
           data: {
             ...badRequestResponse,
-            ...{ message: ['work must be a string'] },
+            ...{ message: ['work はstring を入力してください'] },
           },
         },
       },
@@ -166,7 +166,7 @@ describe('AuthController', () => {
           status: 400,
           data: {
             ...badRequestResponse,
-            ...{ message: ['hobby must be a string'] },
+            ...{ message: ['hobby はstring を入力してください'] },
           },
         },
       },
@@ -180,7 +180,7 @@ describe('AuthController', () => {
           status: 400,
           data: {
             ...badRequestResponse,
-            ...{ message: ['password must be a string'] },
+            ...{ message: ['password はstring を入力してください'] },
           },
         },
       },
@@ -194,7 +194,7 @@ describe('AuthController', () => {
           status: 400,
           data: {
             ...badRequestResponse,
-            ...{ message: ['name should not be empty'] },
+            ...{ message: ['name は入力必須項目です'] },
           },
         },
       },
@@ -208,7 +208,7 @@ describe('AuthController', () => {
           status: 400,
           data: {
             ...badRequestResponse,
-            ...{ message: ['password should not be empty'] },
+            ...{ message: ['password は入力必須項目です'] },
           },
         },
       },
@@ -221,12 +221,12 @@ describe('AuthController', () => {
             ...badRequestResponse,
             ...{
               message: [
-                'name must be a string',
-                'name should not be empty',
-                'work must be a string',
-                'hobby must be a string',
-                'password must be a string',
-                'password should not be empty',
+                'name はstring を入力してください',
+                'name は入力必須項目です',
+                'work はstring を入力してください',
+                'hobby はstring を入力してください',
+                'password はstring を入力してください',
+                'password は入力必須項目です',
               ],
             },
           },
@@ -242,7 +242,7 @@ describe('AuthController', () => {
           status: 400,
           data: {
             ...badRequestResponse,
-            ...{ message: ['property unknownKey should not exist'] },
+            ...{ message: ['unknownKey という項目は存在しません'] },
           },
         },
       },
@@ -328,7 +328,7 @@ describe('AuthController', () => {
           status: 400,
           data: {
             ...badRequestResponse,
-            ...{ message: ['name must be a string'] },
+            ...{ message: ['name はstring を入力してください'] },
           },
         },
       },
@@ -342,7 +342,7 @@ describe('AuthController', () => {
           status: 400,
           data: {
             ...badRequestResponse,
-            ...{ message: ['password must be a string'] },
+            ...{ message: ['password はstring を入力してください'] },
           },
         },
       },
@@ -356,7 +356,7 @@ describe('AuthController', () => {
           status: 400,
           data: {
             ...badRequestResponse,
-            ...{ message: ['name must be a string'] },
+            ...{ message: ['name はstring を入力してください'] },
           },
         },
       },
@@ -370,7 +370,7 @@ describe('AuthController', () => {
           status: 400,
           data: {
             ...badRequestResponse,
-            ...{ message: ['password must be a string'] },
+            ...{ message: ['password はstring を入力してください'] },
           },
         },
       },
@@ -383,10 +383,10 @@ describe('AuthController', () => {
             ...badRequestResponse,
             ...{
               message: [
-                'name should not be empty',
-                'name must be a string',
-                'password should not be empty',
-                'password must be a string',
+                'name はstring を入力してください',
+                'name は入力必須項目です',
+                'password はstring を入力してください',
+                'password は入力必須項目です',
               ],
             },
           },
@@ -402,7 +402,7 @@ describe('AuthController', () => {
           status: 400,
           data: {
             ...badRequestResponse,
-            ...{ message: ['property unknownKey should not exist'] },
+            ...{ message: ['unknownKey という項目は存在しません'] },
           },
         },
       },

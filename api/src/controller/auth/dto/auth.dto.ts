@@ -1,11 +1,22 @@
 import { IsNotEmpty, IsString } from 'class-validator';
+import { classValidatorMessages } from '../../..//utils/validators/class-validator-messages';
+
+const { isNotEmpty, isString } = classValidatorMessages;
 
 export class AuthDto {
-  @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({
+    message: isNotEmpty,
+  })
+  @IsString({
+    message: isString,
+  })
   name: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({
+    message: isNotEmpty,
+  })
+  @IsString({
+    message: isString,
+  })
   password: string;
 }
