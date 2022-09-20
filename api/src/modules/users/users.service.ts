@@ -22,6 +22,16 @@ export class UsersService {
     return await this.user.save(saveData);
   }
 
+  async find(): Promise<User[]> {
+    try {
+      const users = await this.user.find();
+      if (users) return users;
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+    throw new NotFoundException();
+  }
+
   async findById(userId: string): Promise<User> {
     try {
       const user = await this.user.findOne({ where: { id: userId } });
