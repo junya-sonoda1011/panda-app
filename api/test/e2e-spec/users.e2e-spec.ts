@@ -60,6 +60,48 @@ describe('UsersController', () => {
     error: 'Not Found',
   };
 
+  describe('GET /users', () => {
+    const normalCases = [
+      {
+        msg: 'ユーザー一覧取得',
+        expected: {
+          status: 200,
+          data: [response],
+        },
+      },
+    ];
+
+    describe.each(normalCases)('正常系', ({ msg, expected }) => {
+      it(msg, async () => {
+        await request(app.getHttpServer())
+          .get('/users')
+          .set('Authorization', 'Bearer ' + token)
+          .expect(expected.status)
+          .expect(expected.data);
+      });
+    });
+
+    const semiNormalCases = [
+      {
+        msg: 'accessToken が不正',
+        expected: {
+          status: 401,
+          data: unauthorizedResponse,
+        },
+      },
+    ];
+
+    describe.each(semiNormalCases)('準正常系', ({ msg, expected }) => {
+      it(msg, async () => {
+        await request(app.getHttpServer())
+          .get('/users')
+          .set('Authorization', 'Bearer ' + 'invalidToken')
+          .expect(expected.status)
+          .expect(expected.data);
+      });
+    });
+  });
+
   describe('GET /users/me', () => {
     const normalCases = [
       {
