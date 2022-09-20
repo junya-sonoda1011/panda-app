@@ -8,6 +8,7 @@ describe('UsersServiceTest', () => {
   const mockUsersService = () => ({
     save: jest.fn(),
     findById: jest.fn(),
+    find: jest.fn(),
     findByName: jest.fn(),
     findByPayload: jest.fn(),
   });
@@ -27,6 +28,19 @@ describe('UsersServiceTest', () => {
     work: 'testWork',
     hobby: 'testHobby',
   };
+
+  const mockFoundUsers = [
+    {
+      name: 'testNam1',
+      work: 'testWork1',
+      hobby: 'testHobby1',
+    },
+    {
+      name: 'testName2',
+      work: 'testWork2',
+      hobby: 'testHobby2',
+    },
+  ];
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -60,6 +74,18 @@ describe('UsersServiceTest', () => {
         hobby: 'testHobby',
       });
       expect(result).toEqual(mockSavedUser);
+    });
+  });
+
+  describe('find', () => {
+    it('正常系: find メソッドが定義されている', async () => {
+      expect(usersService.find).toBeDefined();
+    });
+    it('正常系: ユーザー一覧取得', async () => {
+      usersService.find.mockResolvedValue(mockFoundUsers);
+
+      const result = await usersService.find();
+      expect(result).toEqual(mockFoundUsers);
     });
   });
 

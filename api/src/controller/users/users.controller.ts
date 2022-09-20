@@ -30,6 +30,14 @@ export class UsersController {
     if (currentUser) return new UserResponse(currentUser);
   }
 
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  @UseFilters(new UsersCtrExceptionFilter())
+  async find() {
+    const users = await this.usersService.find();
+    if (users) return users.map((u) => new UserResponse(u));
+  }
+
   @Get(':userId')
   @UseGuards(JwtAuthGuard)
   @UseFilters(new UsersCtrExceptionFilter())
