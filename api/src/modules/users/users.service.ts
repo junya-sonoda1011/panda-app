@@ -29,7 +29,6 @@ export class UsersService {
     } catch (error) {
       throw new InternalServerErrorException();
     }
-    throw new NotFoundException();
   }
 
   async findById(userId: string): Promise<User> {

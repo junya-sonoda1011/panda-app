@@ -9,6 +9,8 @@ import * as request from 'supertest';
 import { AuthControllerModule } from '../../src/controller/auth/auth.controller.module';
 import { seed } from '../../src/models/seed/seed';
 import { Connection } from 'typeorm';
+import { lastValueFrom } from 'rxjs';
+import { UserResponse } from '../../src/controller/users/response/find-user.response';
 
 describe('UsersController', () => {
   let app: INestApplication;
@@ -31,7 +33,7 @@ describe('UsersController', () => {
     await seed(connection);
 
     const res = await request(app.getHttpServer()).post('/auth/login').send({
-      name: 'testUser',
+      name: 'testUser1',
       password: 'test1234',
     });
 
@@ -42,11 +44,22 @@ describe('UsersController', () => {
     await app.close();
   });
 
-  const response = {
-    name: 'testUser',
-    work: 'work1',
-    hobby: 'hobby1',
+  let responseValue;
+
+  const response = (numberOfUsers: number): UserResponse | UserResponse[] => {
+    responseValue = [];
+    for (let i = 1; i < numberOfUsers + 1; i++) {
+      const user = {
+        name: 'testUser' + i,
+        work: 'work' + i,
+        hobby: 'hobby' + i,
+      };
+      responseValue.push(user);
+    }
+    return responseValue.length == 1 ? responseValue[0] : responseValue;
   };
+
+  console.log('getResponse', response(1));
 
   const unauthorizedResponse = {
     statusCode: 401,
@@ -66,7 +79,7 @@ describe('UsersController', () => {
         msg: 'ユーザー一覧取得',
         expected: {
           status: 200,
-          data: [response],
+          data: response(2),
         },
       },
     ];
@@ -108,7 +121,7 @@ describe('UsersController', () => {
         msg: 'ログインユーザーの情報取得',
         expected: {
           status: 200,
-          data: response,
+          data: response(1),
         },
       },
     ];
@@ -131,7 +144,7 @@ describe('UsersController', () => {
         },
       },
     ];
-    describe.each(semiNormalCases)('異常系', ({ msg, expected }) => {
+    describe.each(semiNormalCases)('準正常系', ({ msg, expected }) => {
       it(msg, async () => {
         await request(app.getHttpServer())
           .get('/users/me')
@@ -149,7 +162,7 @@ describe('UsersController', () => {
         id: '1',
         expected: {
           status: 200,
-          data: response,
+          data: response(1),
         },
       },
     ];
@@ -166,7 +179,7 @@ describe('UsersController', () => {
     const semiNormalCases = [
       {
         msg: '存在しないユーザーID',
-        id: '2',
+        id: '10',
         isValidToken: true,
         expected: {
           status: 404,
@@ -184,7 +197,7 @@ describe('UsersController', () => {
       },
     ];
     describe.each(semiNormalCases)(
-      '異常系',
+      '準正常系',
       ({ msg, id, isValidToken, expected }) => {
         it(msg, async () => {
           await request(app.getHttpServer())

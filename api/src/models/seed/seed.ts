@@ -5,8 +5,10 @@ import * as bcrypt from 'bcrypt';
 
 const saveUser = [
   {
-    name: 'testUser',
     password: 'test1234',
+  },
+  {
+    password: 'test4321',
   },
 ];
 
