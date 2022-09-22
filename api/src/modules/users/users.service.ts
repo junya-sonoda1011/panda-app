@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -72,7 +71,7 @@ class UserData4Save {
   user: User;
 
   constructor(data: SaveUserDto, user?: User) {
-    this.user = user;
+    this.user = Object.assign(new User(), { ...user });
     this.user.name = data?.name;
     this.user.work = data?.work;
     this.user.hobby = data?.hobby;

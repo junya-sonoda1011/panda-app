@@ -47,9 +47,9 @@ describe('AuthController', () => {
 
   describe('POST /signup', () => {
     const signupRequestBody = {
-      name: 'testUser1',
-      work: 'work1',
-      hobby: 'hobby1',
+      name: 'testUser',
+      work: 'work',
+      hobby: 'hobby',
       password: 'test1234',
     };
 

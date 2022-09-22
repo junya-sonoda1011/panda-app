@@ -9,7 +9,6 @@ import * as request from 'supertest';
 import { AuthControllerModule } from '../../src/controller/auth/auth.controller.module';
 import { seed } from '../../src/models/seed/seed';
 import { Connection } from 'typeorm';
-import { lastValueFrom } from 'rxjs';
 import { UserResponse } from '../../src/controller/users/response/find-user.response';
 
 describe('UsersController', () => {
