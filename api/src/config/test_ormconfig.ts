@@ -20,6 +20,7 @@ export const testOrmConfig: ConnectionOptions = {
   entities: entities,
   migrations: ['dist/models/migrations/*.js'],
   synchronize: true,
+  logging: ['warn', 'error'],
 };
 
 export default testOrmConfig;

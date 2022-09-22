@@ -6,10 +6,17 @@ import {
   NotFoundException,
   UnauthorizedException,
   InternalServerErrorException,
+  BadRequestException,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { classValidatorMessages } from '../validators/class-validator-messages';
 
-@Catch(UnauthorizedException, NotFoundException, InternalServerErrorException)
+@Catch(
+  UnauthorizedException,
+  NotFoundException,
+  BadRequestException,
+  InternalServerErrorException,
+)
 export class UsersCtrExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -28,7 +35,19 @@ export class UsersCtrExceptionFilter implements ExceptionFilter {
             '指定されたID のユーザーが存在しません',
           ).getResponse(),
         );
-    else
+    else if (exception instanceof BadRequestException) {
+      const { isNotExist } = classValidatorMessages;
+
+      const isNotExistMessage = isNotExist(exception.getResponse()['message']);
+
+      response
+        .status(status)
+        .json(
+          isNotExistMessage
+            ? new BadRequestException(isNotExistMessage).getResponse()
+            : exception.getResponse(),
+        );
+    } else if (exception instanceof InternalServerErrorException)
       response
         .status(status)
         .json(
