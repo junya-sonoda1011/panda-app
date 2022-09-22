@@ -54,13 +54,13 @@ export class UsersService {
     });
   }
 
-  async update(userId: string, body: SaveUserDto): Promise<void> {
+  async update(userId: string, body: SaveUserDto): Promise<User> {
     try {
       const user = await this.user.findOne({ where: { id: userId } });
       if (!user) throw new NotFoundException();
 
       const updateUser = new UserData4Save(body, user);
-      await this.user.save(updateUser.user);
+      return await this.user.save(updateUser.user);
     } catch (error) {
       throw new NotFoundException();
     }

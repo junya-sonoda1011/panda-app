@@ -16,6 +16,15 @@ describe('UsersController', () => {
   let connection;
   let token;
 
+  const login = async (name: string, password: string) => {
+    const res = await request(app.getHttpServer()).post('/auth/login').send({
+      name: name,
+      password: password,
+    });
+
+    return Object.values(JSON.parse(res.text));
+  };
+
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [TestGlobalModule, AuthControllerModule, UsersControllerModule],
@@ -31,12 +40,7 @@ describe('UsersController', () => {
 
     await seed(connection);
 
-    const res = await request(app.getHttpServer()).post('/auth/login').send({
-      name: 'testUser1',
-      password: 'test1234',
-    });
-
-    token = Object.values(JSON.parse(res.text));
+    token = await login('testUser1', 'test1234');
   });
 
   afterAll(async () => {
@@ -45,25 +49,31 @@ describe('UsersController', () => {
 
   const updateRequestBody = {
     name: 'testUser1',
-    work: 'work1',
-    hobby: 'hobby1',
+    work: 'updateWork1',
+    hobby: 'updateHobby1',
     password: 'test1234',
   };
 
-  let responseValue;
+  let usersResponseValue;
 
-  const response = (numberOfUsers: number): UserResponse | UserResponse[] => {
-    responseValue = [];
+  const findUsersResponse = (
+    numberOfUsers: number,
+  ): UserResponse | UserResponse[] => {
+    usersResponseValue = [];
     for (let i = 1; i < numberOfUsers + 1; i++) {
       const user = {
         name: 'testUser' + i,
         work: 'work' + i,
         hobby: 'hobby' + i,
       };
-      responseValue.push(user);
+      usersResponseValue.push(user);
     }
-    return responseValue.length == 1 ? responseValue[0] : responseValue;
+    return usersResponseValue.length == 1
+      ? usersResponseValue[0]
+      : usersResponseValue;
   };
+
+  const updateResponse = { message: 'ユーザー情報を更新しました' };
 
   const badRequestResponse = {
     statusCode: 400,
@@ -89,7 +99,7 @@ describe('UsersController', () => {
         msg: 'ユーザー一覧取得',
         expected: {
           status: 200,
-          data: response(2),
+          data: findUsersResponse(2),
         },
       },
     ];
@@ -131,7 +141,7 @@ describe('UsersController', () => {
         msg: 'ログインユーザーの情報取得',
         expected: {
           status: 200,
-          data: response(1),
+          data: findUsersResponse(1),
         },
       },
     ];
@@ -172,7 +182,7 @@ describe('UsersController', () => {
         id: '1',
         expected: {
           status: 200,
-          data: response(1),
+          data: findUsersResponse(1),
         },
       },
     ];
@@ -218,31 +228,6 @@ describe('UsersController', () => {
             )
             .expect(expected.status)
             .expect(expected.data);
-        });
-      },
-    );
-  });
-
-  describe('PUT /users/:userId', () => {
-    const normalCases = [
-      {
-        msg: 'ユーザー情報更新',
-        id: '1',
-        requestBody: updateRequestBody,
-        expected: {
-          status: 200,
-        },
-      },
-    ];
-    describe.each(normalCases)(
-      '正常系',
-      ({ msg, id, requestBody, expected }) => {
-        it(msg, async () => {
-          await request(app.getHttpServer())
-            .put(`/users/${id}`)
-            .set('Authorization', 'Bearer ' + token)
-            .send(requestBody)
-            .expect(expected.status);
         });
       },
     );
@@ -483,4 +468,59 @@ describe('UsersController', () => {
       });
     },
   );
+
+  describe('PUT /users/:userId', () => {
+    const normalCases = [
+      {
+        msg: 'ユーザー情報更新（更新前と同じ値）',
+        id: '1',
+        requestBody: {
+          name: 'testUser1',
+          work: 'work1',
+          hobby: 'hobby1',
+          password: 'test1234',
+        },
+        expected: {
+          status: 200,
+          data: updateResponse,
+        },
+      },
+      {
+        msg: 'ユーザー情報更新（一部の項目）',
+        id: '1',
+        requestBody: updateRequestBody,
+        expected: {
+          status: 200,
+          data: updateResponse,
+        },
+      },
+      {
+        msg: 'ユーザー情報更新（全項目）',
+        id: '1',
+        requestBody: {
+          ...updateRequestBody,
+          ...{ name: 'updateTest1', password: 'updatePassword1' },
+        },
+        expected: {
+          status: 200,
+          data: updateResponse,
+        },
+      },
+    ];
+    describe.each(normalCases)(
+      '正常系',
+      ({ msg, id, requestBody, expected }) => {
+        it(msg, async () => {
+          console.log('updateRequestBody', requestBody);
+
+          await request(app.getHttpServer())
+            .put(`/users/${id}`)
+            .set('Authorization', 'Bearer ' + token)
+            .send(requestBody)
+            .expect(expected.status)
+            .expect(expected.data);
+        });
+      },
+    );
+  });
 });
