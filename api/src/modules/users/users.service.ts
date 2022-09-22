@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -19,7 +20,7 @@ export class UsersService {
   async save(body: SaveUserDto): Promise<User> {
     body.password = await bcrypt.hash(body.password, await bcrypt.genSalt());
     const saveData = new UserData4Save(body);
-    return await this.user.save(saveData);
+    return await this.user.save(saveData.user);
   }
 
   async find(): Promise<User[]> {
@@ -29,7 +30,6 @@ export class UsersService {
     } catch (error) {
       throw new InternalServerErrorException();
     }
-    throw new NotFoundException();
   }
 
   async findById(userId: string): Promise<User> {
@@ -54,20 +54,28 @@ export class UsersService {
       where: { id: payload.id, name: payload.username },
     });
   }
+
+  async update(userId: string, body: SaveUserDto): Promise<void> {
+    try {
+      const user = await this.user.findOne({ where: { id: userId } });
+      if (!user) throw new NotFoundException();
+
+      const updateUser = new UserData4Save(body, user);
+      await this.user.save(updateUser.user);
+    } catch (error) {
+      throw new NotFoundException();
+    }
+  }
 }
 
 class UserData4Save {
-  name: string;
-  work: string;
-  hobby: string;
-  password: string;
-  createdAt: string;
-  updatedAt: string;
+  user: User;
 
-  constructor(data: SaveUserDto) {
-    this.name = data.name;
-    this.work = data.work;
-    this.hobby = data.hobby;
-    this.password = data.password;
+  constructor(data: SaveUserDto, user?: User) {
+    this.user = user;
+    this.user.name = data?.name;
+    this.user.work = data?.work;
+    this.user.hobby = data?.hobby;
+    this.user.password = data?.password;
   }
 }

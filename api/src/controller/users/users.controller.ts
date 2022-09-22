@@ -1,8 +1,10 @@
 import {
+  Body,
   ClassSerializerInterceptor,
   Controller,
   Get,
   Param,
+  Put,
   UseFilters,
   UseGuards,
   UseInterceptors,
@@ -15,6 +17,7 @@ import { CurrentUser } from '../../utils/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../../utils/guards/jwt-auth.guard';
 
 import { UserResponse } from './response/find-user.response';
+import { SaveUserDto } from '../auth/dto/save-user.dto';
 
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -44,5 +47,16 @@ export class UsersController {
   async findById(@Param('userId') userId: string) {
     const user = await this.usersService.findById(userId);
     if (user) return new UserResponse(user);
+  }
+
+  @Put(':userId')
+  @UseGuards(JwtAuthGuard)
+  @UseFilters(new UsersCtrExceptionFilter())
+  async update(
+    @Param('userId') userId: string,
+    @Body() saveUserDto: SaveUserDto,
+  ) {
+    await this.usersService.update(userId, saveUserDto);
+    return 'update';
   }
 }

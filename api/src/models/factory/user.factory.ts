@@ -4,7 +4,7 @@ export class UserFactory extends BaseFactory {
   static async getValue(value = '1') {
     return {
       id: value,
-      name: 'name' + value,
+      name: 'testUser' + value,
       work: 'work' + value,
       hobby: 'hobby' + value,
       password: 'password' + value,
