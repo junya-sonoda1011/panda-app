@@ -56,6 +56,7 @@ export class UsersService {
 
   async update(userId: string, body: SaveUserDto): Promise<User> {
     try {
+      body.password = await bcrypt.hash(body.password, await bcrypt.genSalt());
       const user = await this.user.findOne({ where: { id: userId } });
       if (!user) throw new NotFoundException();
 

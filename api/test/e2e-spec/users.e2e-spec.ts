@@ -10,20 +10,16 @@ import { AuthControllerModule } from '../../src/controller/auth/auth.controller.
 import { seed } from '../../src/models/seed/seed';
 import { Connection } from 'typeorm';
 import { UserResponse } from '../../src/controller/users/response/find-user.response';
+import { AuthService } from '../../src/modules/auth/auth.service';
 
 describe('UsersController', () => {
   let app: INestApplication;
-  let connection;
-  let token;
+  let connection: Connection;
+  let authService: AuthService;
+  let token: string[];
 
-  const login = async (name: string, password: string) => {
-    const res = await request(app.getHttpServer()).post('/auth/login').send({
-      name: name,
-      password: password,
-    });
-
-    return Object.values(JSON.parse(res.text));
-  };
+  type GetToken = (name: string, password: string) => Promise<string[]>;
+  let getToken: GetToken;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -35,12 +31,21 @@ describe('UsersController', () => {
     app.useGlobalPipes(new ValidationPipe(testValidationPipeOptions));
     connection = moduleRef.get<Connection>(Connection);
 
+    authService = moduleRef.get<AuthService>(AuthService);
     await app.init();
     await app.getHttpAdapter().getInstance();
 
     await seed(connection);
 
-    token = await login('testUser1', 'test1234');
+    getToken = async (name: string, password: string): Promise<string[]> => {
+      return Object.values(
+        await authService.login({
+          name: name,
+          password: password,
+        }),
+      );
+    };
+    token = await getToken('testUser1', 'test1234');
   });
 
   afterAll(async () => {
@@ -233,242 +238,6 @@ describe('UsersController', () => {
     );
   });
 
-  const semiNormalCases = [
-    {
-      msg: '存在しないユーザーID',
-      id: '10',
-      isValidToken: true,
-      requestBody: updateRequestBody,
-      expected: {
-        status: 404,
-        data: notFoundResponse,
-      },
-    },
-    {
-      msg: 'accessToken が不正',
-      id: '1',
-      isValidToken: false,
-      expected: {
-        status: 401,
-        data: unauthorizedResponse,
-      },
-    },
-    {
-      msg: 'name の値がNumber',
-      id: '1',
-      isValidToken: true,
-      requestBody: {
-        ...updateRequestBody,
-        ...{ name: 123 },
-      },
-      expected: {
-        status: 400,
-        data: {
-          ...badRequestResponse,
-          ...{ message: ['name はstring を入力してください'] },
-        },
-      },
-    },
-    {
-      msg: 'work の値がNumber',
-      id: '1',
-      isValidToken: true,
-      requestBody: {
-        ...updateRequestBody,
-        ...{ work: 123 },
-      },
-      expected: {
-        status: 400,
-        data: {
-          ...badRequestResponse,
-          ...{ message: ['work はstring を入力してください'] },
-        },
-      },
-    },
-    {
-      msg: 'hobby の値がNumber',
-      id: '1',
-      isValidToken: true,
-      requestBody: {
-        ...updateRequestBody,
-        ...{ hobby: 123 },
-      },
-      expected: {
-        status: 400,
-        data: {
-          ...badRequestResponse,
-          ...{ message: ['hobby はstring を入力してください'] },
-        },
-      },
-    },
-    {
-      msg: 'password の値がNumber',
-      id: '1',
-      isValidToken: true,
-      requestBody: {
-        ...updateRequestBody,
-        ...{ password: 123 },
-      },
-      expected: {
-        status: 400,
-        data: {
-          ...badRequestResponse,
-          ...{ message: ['password はstring を入力してください'] },
-        },
-      },
-    },
-    {
-      msg: 'name の値がBoolean',
-      id: '1',
-      isValidToken: true,
-      requestBody: {
-        ...updateRequestBody,
-        ...{ name: true },
-      },
-      expected: {
-        status: 400,
-        data: {
-          ...badRequestResponse,
-          ...{ message: ['name はstring を入力してください'] },
-        },
-      },
-    },
-    {
-      msg: 'work の値がBoolean',
-      id: '1',
-      isValidToken: true,
-      requestBody: {
-        ...updateRequestBody,
-        ...{ work: true },
-      },
-      expected: {
-        status: 400,
-        data: {
-          ...badRequestResponse,
-          ...{ message: ['work はstring を入力してください'] },
-        },
-      },
-    },
-    {
-      msg: 'hobby の値がBoolean',
-      id: '1',
-      isValidToken: true,
-      requestBody: {
-        ...updateRequestBody,
-        ...{ hobby: true },
-      },
-      expected: {
-        status: 400,
-        data: {
-          ...badRequestResponse,
-          ...{ message: ['hobby はstring を入力してください'] },
-        },
-      },
-    },
-    {
-      msg: 'password の値がBoolean',
-      id: '1',
-      isValidToken: true,
-      requestBody: {
-        ...updateRequestBody,
-        ...{ password: true },
-      },
-      expected: {
-        status: 400,
-        data: {
-          ...badRequestResponse,
-          ...{ message: ['password はstring を入力してください'] },
-        },
-      },
-    },
-    {
-      msg: 'name の値が空文字',
-      id: '1',
-      isValidToken: true,
-      requestBody: {
-        ...updateRequestBody,
-        ...{ name: '' },
-      },
-      expected: {
-        status: 400,
-        data: {
-          ...badRequestResponse,
-          ...{ message: ['name は入力必須項目です'] },
-        },
-      },
-    },
-    {
-      msg: 'password の値が空文字',
-      id: '1',
-      isValidToken: true,
-      requestBody: {
-        ...updateRequestBody,
-        ...{ password: '' },
-      },
-      expected: {
-        status: 400,
-        data: {
-          ...badRequestResponse,
-          ...{ message: ['password は入力必須項目です'] },
-        },
-      },
-    },
-    {
-      msg: 'requestBody が空のオブジェクト',
-      id: '1',
-      isValidToken: true,
-      requestBody: {},
-      expected: {
-        status: 400,
-        data: {
-          ...badRequestResponse,
-          ...{
-            message: [
-              'name はstring を入力してください',
-              'name は入力必須項目です',
-              'work はstring を入力してください',
-              'hobby はstring を入力してください',
-              'password はstring を入力してください',
-              'password は入力必須項目です',
-            ],
-          },
-        },
-      },
-    },
-    {
-      msg: '存在しない Key がある',
-      id: '1',
-      isValidToken: true,
-      requestBody: {
-        ...updateRequestBody,
-        ...{ unknownKey: 'unknownValue' },
-      },
-      expected: {
-        status: 400,
-        data: {
-          ...badRequestResponse,
-          ...{ message: ['unknownKey という項目は存在しません'] },
-        },
-      },
-    },
-  ];
-  describe.each(semiNormalCases)(
-    '準正常系',
-    ({ msg, id, isValidToken, requestBody, expected }) => {
-      it(msg, async () => {
-        await request(app.getHttpServer())
-          .put(`/users/${id}`)
-          .set(
-            'Authorization',
-            isValidToken ? 'Bearer ' + token : 'Bearer ' + 'invalidToken',
-          )
-          .send(requestBody)
-          .expect(expected.status)
-          .expect(expected.data);
-      });
-    },
-  );
-
   describe('PUT /users/:userId', () => {
     const normalCases = [
       {
@@ -499,7 +268,7 @@ describe('UsersController', () => {
         id: '1',
         requestBody: {
           ...updateRequestBody,
-          ...{ name: 'updateTest1', password: 'updatePassword1' },
+          ...{ name: 'updateTest1', password: 'updateTest1234' },
         },
         expected: {
           status: 200,
@@ -510,12 +279,251 @@ describe('UsersController', () => {
     describe.each(normalCases)(
       '正常系',
       ({ msg, id, requestBody, expected }) => {
+        afterAll(async () => {
+          if (requestBody.name == 'updateTest1') {
+            token = await getToken('updateTest1', 'updateTest1234');
+          }
+        });
         it(msg, async () => {
-          console.log('updateRequestBody', requestBody);
-
           await request(app.getHttpServer())
             .put(`/users/${id}`)
             .set('Authorization', 'Bearer ' + token)
+            .send(requestBody)
+            .expect(expected.status)
+            .expect(expected.data);
+        });
+      },
+    );
+
+    const semiNormalCases = [
+      {
+        msg: '存在しないユーザーID',
+        id: '10',
+        isValidToken: true,
+        requestBody: updateRequestBody,
+        expected: {
+          status: 404,
+          data: notFoundResponse,
+        },
+      },
+      {
+        msg: 'accessToken が不正',
+        id: '1',
+        isValidToken: false,
+        expected: {
+          status: 401,
+          data: unauthorizedResponse,
+        },
+      },
+      {
+        msg: 'name の値がNumber',
+        id: '1',
+        isValidToken: true,
+        requestBody: {
+          ...updateRequestBody,
+          ...{ name: 123 },
+        },
+        expected: {
+          status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['name はstring を入力してください'] },
+          },
+        },
+      },
+      {
+        msg: 'work の値がNumber',
+        id: '1',
+        isValidToken: true,
+        requestBody: {
+          ...updateRequestBody,
+          ...{ work: 123 },
+        },
+        expected: {
+          status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['work はstring を入力してください'] },
+          },
+        },
+      },
+      {
+        msg: 'hobby の値がNumber',
+        id: '1',
+        isValidToken: true,
+        requestBody: {
+          ...updateRequestBody,
+          ...{ hobby: 123 },
+        },
+        expected: {
+          status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['hobby はstring を入力してください'] },
+          },
+        },
+      },
+      {
+        msg: 'password の値がNumber',
+        id: '1',
+        isValidToken: true,
+        requestBody: {
+          ...updateRequestBody,
+          ...{ password: 123 },
+        },
+        expected: {
+          status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['password はstring を入力してください'] },
+          },
+        },
+      },
+      {
+        msg: 'name の値がBoolean',
+        id: '1',
+        isValidToken: true,
+        requestBody: {
+          ...updateRequestBody,
+          ...{ name: true },
+        },
+        expected: {
+          status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['name はstring を入力してください'] },
+          },
+        },
+      },
+      {
+        msg: 'work の値がBoolean',
+        id: '1',
+        isValidToken: true,
+        requestBody: {
+          ...updateRequestBody,
+          ...{ work: true },
+        },
+        expected: {
+          status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['work はstring を入力してください'] },
+          },
+        },
+      },
+      {
+        msg: 'hobby の値がBoolean',
+        id: '1',
+        isValidToken: true,
+        requestBody: {
+          ...updateRequestBody,
+          ...{ hobby: true },
+        },
+        expected: {
+          status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['hobby はstring を入力してください'] },
+          },
+        },
+      },
+      {
+        msg: 'password の値がBoolean',
+        id: '1',
+        isValidToken: true,
+        requestBody: {
+          ...updateRequestBody,
+          ...{ password: true },
+        },
+        expected: {
+          status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['password はstring を入力してください'] },
+          },
+        },
+      },
+      {
+        msg: 'name の値が空文字',
+        id: '1',
+        isValidToken: true,
+        requestBody: {
+          ...updateRequestBody,
+          ...{ name: '' },
+        },
+        expected: {
+          status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['name は入力必須項目です'] },
+          },
+        },
+      },
+      {
+        msg: 'password の値が空文字',
+        id: '1',
+        isValidToken: true,
+        requestBody: {
+          ...updateRequestBody,
+          ...{ password: '' },
+        },
+        expected: {
+          status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['password は入力必須項目です'] },
+          },
+        },
+      },
+      {
+        msg: 'requestBody が空のオブジェクト',
+        id: '1',
+        isValidToken: true,
+        requestBody: {},
+        expected: {
+          status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{
+              message: [
+                'name はstring を入力してください',
+                'name は入力必須項目です',
+                'work はstring を入力してください',
+                'hobby はstring を入力してください',
+                'password はstring を入力してください',
+                'password は入力必須項目です',
+              ],
+            },
+          },
+        },
+      },
+      {
+        msg: '存在しない Key がある',
+        id: '1',
+        isValidToken: true,
+        requestBody: {
+          ...updateRequestBody,
+          ...{ unknownKey: 'unknownValue' },
+        },
+        expected: {
+          status: 400,
+          data: {
+            ...badRequestResponse,
+            ...{ message: ['unknownKey という項目は存在しません'] },
+          },
+        },
+      },
+    ];
+    describe.each(semiNormalCases)(
+      '準正常系',
+      ({ msg, id, isValidToken, requestBody, expected }) => {
+        it(msg, async () => {
+          await request(app.getHttpServer())
+            .put(`/users/${id}`)
+            .set(
+              'Authorization',
+              isValidToken ? 'Bearer ' + token : 'Bearer ' + 'invalidToken',
+            )
             .send(requestBody)
             .expect(expected.status)
             .expect(expected.data);
