@@ -17,9 +17,13 @@ export class UsersService {
   ) {}
 
   async save(body: SaveUserDto): Promise<User> {
-    body.password = await bcrypt.hash(body.password, await bcrypt.genSalt());
-    const saveData = new UserData4Save(body);
-    return await this.user.save(saveData.user);
+    try {
+      body.password = await bcrypt.hash(body.password, await bcrypt.genSalt());
+      const saveData = new UserData4Save(body);
+      return await this.user.save(saveData.user);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
   async find(): Promise<User[]> {
@@ -29,6 +33,7 @@ export class UsersService {
     } catch (error) {
       throw new InternalServerErrorException();
     }
+    throw new NotFoundException();
   }
 
   async findById(userId: string): Promise<User> {
@@ -58,13 +63,14 @@ export class UsersService {
     try {
       body.password = await bcrypt.hash(body.password, await bcrypt.genSalt());
       const user = await this.user.findOne({ where: { id: userId } });
-      if (!user) throw new NotFoundException();
-
-      const updateUser = new UserData4Save(body, user);
-      return await this.user.save(updateUser.user);
+      if (user) {
+        const updateUser = new UserData4Save(body, user);
+        return await this.user.save(updateUser.user);
+      }
     } catch (error) {
-      throw new NotFoundException();
+      throw new InternalServerErrorException();
     }
+    throw new NotFoundException();
   }
 }
 
