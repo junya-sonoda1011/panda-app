@@ -8,9 +8,10 @@ import {
 import * as request from 'supertest';
 import { AuthControllerModule } from '../../src/controller/auth/auth.controller.module';
 import { seed } from '../../src/models/seed/seed';
-import { Connection } from 'typeorm';
+import { Connection, getConnection } from 'typeorm';
 import { UserResponse } from '../../src/controller/users/response/find-user.response';
 import { AuthService } from '../../src/modules/auth/auth.service';
+import { UserSaveConfirmation } from '../../test/save-confirmations/user.save-confirmation';
 
 describe('UsersController', () => {
   let app: INestApplication;
@@ -291,6 +292,11 @@ describe('UsersController', () => {
             .send(requestBody)
             .expect(expected.status)
             .expect(expected.data);
+          await UserSaveConfirmation.confirmSave(
+            getConnection(),
+            requestBody,
+            id,
+          );
         });
       },
     );

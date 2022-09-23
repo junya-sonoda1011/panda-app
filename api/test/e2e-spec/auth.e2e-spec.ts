@@ -1,17 +1,18 @@
-import { ValidationPipe } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
-import { Connection } from 'typeorm';
+import { Connection, getConnection } from 'typeorm';
 import { AuthControllerModule } from '../../src/controller/auth/auth.controller.module';
 import {
   TestGlobalModule,
   testValidationPipeOptions,
 } from '../test-global.module';
 import { seed } from '../../src/models/seed/seed';
+import { UserSaveConfirmation } from '../../test/save-confirmations/user.save-confirmation';
 
 describe('AuthController', () => {
-  let app;
-  let connection;
+  let app: INestApplication;
+  let connection: Connection;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -68,6 +69,7 @@ describe('AuthController', () => {
           .post('/auth/signup')
           .send(requestBody)
           .expect(expected.status);
+        await UserSaveConfirmation.confirmSave(getConnection(), requestBody);
       });
     });
 
