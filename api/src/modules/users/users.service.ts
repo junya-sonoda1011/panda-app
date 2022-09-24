@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -9,6 +8,7 @@ import { SaveUserDto } from '../../controller/auth/dto/save-user.dto';
 import { User } from '../../models/entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { UpdateUserDto } from '../../controller/users/dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -18,9 +18,13 @@ export class UsersService {
   ) {}
 
   async save(body: SaveUserDto): Promise<User> {
-    body.password = await bcrypt.hash(body.password, await bcrypt.genSalt());
-    const saveData = new UserData4Save(body);
-    return await this.user.save(saveData.user);
+    try {
+      body.password = await bcrypt.hash(body.password, await bcrypt.genSalt());
+      const saveData = new UserData4Save(body);
+      return await this.user.save(saveData.user);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
   async find(): Promise<User[]> {
@@ -30,6 +34,7 @@ export class UsersService {
     } catch (error) {
       throw new InternalServerErrorException();
     }
+    throw new NotFoundException();
   }
 
   async findById(userId: string): Promise<User> {
@@ -55,24 +60,30 @@ export class UsersService {
     });
   }
 
-  async update(userId: string, body: SaveUserDto): Promise<void> {
+  async update(userId: string, body: UpdateUserDto): Promise<User> {
     try {
+      if (body.password)
+        body.password = await bcrypt.hash(
+          body.password,
+          await bcrypt.genSalt(),
+        );
       const user = await this.user.findOne({ where: { id: userId } });
-      if (!user) throw new NotFoundException();
-
-      const updateUser = new UserData4Save(body, user);
-      await this.user.save(updateUser.user);
+      if (user) {
+        const updateUser = new UserData4Save(body, user);
+        return await this.user.save(updateUser.user);
+      }
     } catch (error) {
-      throw new NotFoundException();
+      throw new InternalServerErrorException();
     }
+    throw new NotFoundException();
   }
 }
 
 class UserData4Save {
   user: User;
 
-  constructor(data: SaveUserDto, user?: User) {
-    this.user = user;
+  constructor(data: SaveUserDto | UpdateUserDto, user?: User) {
+    this.user = Object.assign(new User(), { ...user });
     this.user.name = data?.name;
     this.user.work = data?.work;
     this.user.hobby = data?.hobby;

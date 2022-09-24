@@ -17,7 +17,7 @@ import { CurrentUser } from '../../utils/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../../utils/guards/jwt-auth.guard';
 
 import { UserResponse } from './response/find-user.response';
-import { SaveUserDto } from '../auth/dto/save-user.dto';
+import { UpdateUserDto } from '../users/dto/update-user.dto';
 
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -36,7 +36,7 @@ export class UsersController {
   @Get()
   @UseGuards(JwtAuthGuard)
   @UseFilters(new UsersCtrExceptionFilter())
-  async find() {
+  async find(): Promise<UserResponse[]> {
     const users = await this.usersService.find();
     if (users) return users.map((u) => new UserResponse(u));
   }
@@ -44,7 +44,7 @@ export class UsersController {
   @Get(':userId')
   @UseGuards(JwtAuthGuard)
   @UseFilters(new UsersCtrExceptionFilter())
-  async findById(@Param('userId') userId: string) {
+  async findById(@Param('userId') userId: string): Promise<UserResponse> {
     const user = await this.usersService.findById(userId);
     if (user) return new UserResponse(user);
   }
@@ -54,9 +54,9 @@ export class UsersController {
   @UseFilters(new UsersCtrExceptionFilter())
   async update(
     @Param('userId') userId: string,
-    @Body() saveUserDto: SaveUserDto,
-  ) {
+    @Body() saveUserDto: UpdateUserDto,
+  ): Promise<{ message: string }> {
     await this.usersService.update(userId, saveUserDto);
-    return 'update';
+    return { message: 'ユーザー情報を更新しました' };
   }
 }

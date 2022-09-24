@@ -1,7 +1,7 @@
 export const classValidatorMessages = {
   isNotEmpty: '$property は入力必須項目です',
   isString: '$property はstring を入力してください',
-  isNotExist(message) {
+  isNotExist(message: [string]) {
     const regex = /should not exist/;
 
     // property $property should not exist と一致するメッセージが含まれるか確認する

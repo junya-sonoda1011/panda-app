@@ -1,17 +1,18 @@
-import { ValidationPipe } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
-import { Connection } from 'typeorm';
+import { Connection, getConnection } from 'typeorm';
 import { AuthControllerModule } from '../../src/controller/auth/auth.controller.module';
 import {
   TestGlobalModule,
   testValidationPipeOptions,
 } from '../test-global.module';
 import { seed } from '../../src/models/seed/seed';
+import { UserSaveConfirmation } from '../../test/save-confirmations/user.save-confirmation';
 
 describe('AuthController', () => {
-  let app;
-  let connection;
+  let app: INestApplication;
+  let connection: Connection;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -47,9 +48,9 @@ describe('AuthController', () => {
 
   describe('POST /signup', () => {
     const signupRequestBody = {
-      name: 'testUser1',
-      work: 'work1',
-      hobby: 'hobby1',
+      name: 'testUser',
+      work: 'work',
+      hobby: 'hobby',
       password: 'test1234',
     };
 
@@ -68,6 +69,7 @@ describe('AuthController', () => {
           .post('/auth/signup')
           .send(requestBody)
           .expect(expected.status);
+        await UserSaveConfirmation.confirmSave(getConnection(), requestBody);
       });
     });
 
@@ -224,7 +226,9 @@ describe('AuthController', () => {
                 'name はstring を入力してください',
                 'name は入力必須項目です',
                 'work はstring を入力してください',
+                'work は入力必須項目です',
                 'hobby はstring を入力してください',
+                'hobby は入力必須項目です',
                 'password はstring を入力してください',
                 'password は入力必須項目です',
               ],
