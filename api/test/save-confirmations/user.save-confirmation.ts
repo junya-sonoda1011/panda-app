@@ -18,7 +18,9 @@ export class UserSaveConfirmation {
       : await userRepository.findOne({ where: { name: data.name } });
 
     if (data.name) expect(data.name).toEqual(savedUser.name);
-    if (data.work) expect(data.work).toEqual(savedUser.work);
+
+    if (data.work) await expect(data.work).toEqual(savedUser?.work);
+
     if (data.hobby) expect(data.hobby).toEqual(savedUser.hobby);
     if (data.password)
       expect(await bcrypt.compare(data.password, savedUser.password)).toEqual(

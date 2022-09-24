@@ -49,6 +49,17 @@ export class UsersController {
     if (user) return new UserResponse(user);
   }
 
+  @Put('me')
+  @UseGuards(JwtAuthGuard)
+  @UseFilters(new UsersCtrExceptionFilter())
+  async updateCurrentUser(
+    @CurrentUser() currentUser: User,
+    @Body() saveUserDto: UpdateUserDto,
+  ): Promise<{ message: string }> {
+    await this.usersService.updateCurrentUser(currentUser, saveUserDto);
+    return { message: 'ユーザー情報を更新しました' };
+  }
+
   @Put(':userId')
   @UseGuards(JwtAuthGuard)
   @UseFilters(new UsersCtrExceptionFilter())

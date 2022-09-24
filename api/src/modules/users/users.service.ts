@@ -60,6 +60,23 @@ export class UsersService {
     });
   }
 
+  async updateCurrentUser(user: User, body: UpdateUserDto): Promise<User> {
+    try {
+      if (body.password)
+        body.password = await bcrypt.hash(
+          body.password,
+          await bcrypt.genSalt(),
+        );
+      if (user) {
+        const updateUser = new UserData4Save(body, user);
+        return await this.user.save(updateUser.user);
+      }
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+    throw new NotFoundException();
+  }
+
   async update(userId: string, body: UpdateUserDto): Promise<User> {
     try {
       if (body.password)
