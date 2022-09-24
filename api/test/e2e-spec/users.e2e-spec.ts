@@ -54,10 +54,8 @@ describe('UsersController', () => {
   });
 
   const updateRequestBody = {
-    name: 'testUser1',
     work: 'updateWork1',
     hobby: 'updateHobby1',
-    password: 'test1234',
   };
 
   let usersResponseValue;
@@ -281,7 +279,7 @@ describe('UsersController', () => {
       '正常系',
       ({ msg, id, requestBody, expected }) => {
         afterAll(async () => {
-          if (requestBody.name == 'updateTest1') {
+          if (msg == 'ユーザー情報更新（全項目）') {
             token = await getToken('updateTest1', 'updateTest1234');
           }
         });
@@ -446,60 +444,6 @@ describe('UsersController', () => {
           data: {
             ...badRequestResponse,
             ...{ message: ['password はstring を入力してください'] },
-          },
-        },
-      },
-      {
-        msg: 'name の値が空文字',
-        id: '1',
-        isValidToken: true,
-        requestBody: {
-          ...updateRequestBody,
-          ...{ name: '' },
-        },
-        expected: {
-          status: 400,
-          data: {
-            ...badRequestResponse,
-            ...{ message: ['name は入力必須項目です'] },
-          },
-        },
-      },
-      {
-        msg: 'password の値が空文字',
-        id: '1',
-        isValidToken: true,
-        requestBody: {
-          ...updateRequestBody,
-          ...{ password: '' },
-        },
-        expected: {
-          status: 400,
-          data: {
-            ...badRequestResponse,
-            ...{ message: ['password は入力必須項目です'] },
-          },
-        },
-      },
-      {
-        msg: 'requestBody が空のオブジェクト',
-        id: '1',
-        isValidToken: true,
-        requestBody: {},
-        expected: {
-          status: 400,
-          data: {
-            ...badRequestResponse,
-            ...{
-              message: [
-                'name はstring を入力してください',
-                'name は入力必須項目です',
-                'work はstring を入力してください',
-                'hobby はstring を入力してください',
-                'password はstring を入力してください',
-                'password は入力必須項目です',
-              ],
-            },
           },
         },
       },

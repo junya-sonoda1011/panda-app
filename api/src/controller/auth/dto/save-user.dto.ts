@@ -12,11 +12,17 @@ export class SaveUserDto {
   })
   name: string;
 
+  @IsNotEmpty({
+    message: isNotEmpty,
+  })
   @IsString({
     message: isString,
   })
   work: string;
 
+  @IsNotEmpty({
+    message: isNotEmpty,
+  })
   @IsString({
     message: isString,
   })

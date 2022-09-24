@@ -8,6 +8,7 @@ import { SaveUserDto } from '../../controller/auth/dto/save-user.dto';
 import { User } from '../../models/entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { UpdateUserDto } from '../../controller/users/dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -59,9 +60,13 @@ export class UsersService {
     });
   }
 
-  async update(userId: string, body: SaveUserDto): Promise<User> {
+  async update(userId: string, body: UpdateUserDto): Promise<User> {
     try {
-      body.password = await bcrypt.hash(body.password, await bcrypt.genSalt());
+      if (body.password)
+        body.password = await bcrypt.hash(
+          body.password,
+          await bcrypt.genSalt(),
+        );
       const user = await this.user.findOne({ where: { id: userId } });
       if (user) {
         const updateUser = new UserData4Save(body, user);
@@ -77,7 +82,7 @@ export class UsersService {
 class UserData4Save {
   user: User;
 
-  constructor(data: SaveUserDto, user?: User) {
+  constructor(data: SaveUserDto | UpdateUserDto, user?: User) {
     this.user = Object.assign(new User(), { ...user });
     this.user.name = data?.name;
     this.user.work = data?.work;

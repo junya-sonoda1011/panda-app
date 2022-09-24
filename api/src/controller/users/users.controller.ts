@@ -17,7 +17,7 @@ import { CurrentUser } from '../../utils/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../../utils/guards/jwt-auth.guard';
 
 import { UserResponse } from './response/find-user.response';
-import { SaveUserDto } from '../auth/dto/save-user.dto';
+import { UpdateUserDto } from '../users/dto/update-user.dto';
 
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -54,7 +54,7 @@ export class UsersController {
   @UseFilters(new UsersCtrExceptionFilter())
   async update(
     @Param('userId') userId: string,
-    @Body() saveUserDto: SaveUserDto,
+    @Body() saveUserDto: UpdateUserDto,
   ): Promise<{ message: string }> {
     await this.usersService.update(userId, saveUserDto);
     return { message: 'ユーザー情報を更新しました' };

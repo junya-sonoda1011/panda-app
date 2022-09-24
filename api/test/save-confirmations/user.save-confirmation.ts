@@ -2,11 +2,12 @@ import { SaveUserDto } from '../../src/controller/auth/dto/save-user.dto';
 import { Connection } from 'typeorm';
 import { User } from '../../src/models/entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import { UpdateUserDto } from '../../src/controller/users/dto/update-user.dto';
 
 export class UserSaveConfirmation {
   static async confirmSave(
     connection: Connection,
-    data: SaveUserDto,
+    data: SaveUserDto | UpdateUserDto,
     userId?: string,
   ): Promise<void> {
     if (userId) expect(userId).toBeDefined();
