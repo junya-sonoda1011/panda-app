@@ -2,6 +2,7 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Delete,
   Get,
   Param,
   Put,
@@ -24,6 +25,14 @@ import { UpdateUserDto } from '../users/dto/update-user.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  @UseFilters(new UsersCtrExceptionFilter())
+  async find(): Promise<UserResponse[]> {
+    const users = await this.usersService.find();
+    if (users) return users.map((u) => new UserResponse(u));
+  }
+
   @Get('me')
   @UseGuards(JwtAuthGuard)
   @UseFilters(UsersCtrExceptionFilter)
@@ -31,14 +40,6 @@ export class UsersController {
     @CurrentUser() currentUser: User,
   ): Promise<UserResponse> {
     if (currentUser) return new UserResponse(currentUser);
-  }
-
-  @Get()
-  @UseGuards(JwtAuthGuard)
-  @UseFilters(new UsersCtrExceptionFilter())
-  async find(): Promise<UserResponse[]> {
-    const users = await this.usersService.find();
-    if (users) return users.map((u) => new UserResponse(u));
   }
 
   @Get(':userId')
@@ -69,5 +70,21 @@ export class UsersController {
   ): Promise<{ message: string }> {
     await this.usersService.update(userId, saveUserDto);
     return { message: 'ユーザー情報を更新しました' };
+  }
+
+  @Delete('me')
+  @UseGuards(JwtAuthGuard)
+  @UseFilters(new UsersCtrExceptionFilter())
+  async deleteCurrentUser(@CurrentUser() currentUser: User) {
+    await this.usersService.deleteCurrentUser(currentUser);
+    return { message: 'ユーザーを削除しました' };
+  }
+
+  @Delete(':userId')
+  @UseGuards(JwtAuthGuard)
+  @UseFilters(new UsersCtrExceptionFilter())
+  async delete(@Param('userId') userId: string) {
+    await this.usersService.delete(userId);
+    return { message: 'ユーザーを削除しました' };
   }
 }

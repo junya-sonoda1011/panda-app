@@ -4,7 +4,7 @@ import { User } from '../../src/models/entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from '../../src/controller/users/dto/update-user.dto';
 
-export class UserSaveConfirmation {
+export class UserTestConfirmation {
   static async confirmSave(
     connection: Connection,
     data: SaveUserDto | UpdateUserDto,
@@ -26,5 +26,19 @@ export class UserSaveConfirmation {
       expect(await bcrypt.compare(data.password, savedUser.password)).toEqual(
         true,
       );
+  }
+
+  static async confirmDelete(
+    connection: Connection,
+    userId: string,
+  ): Promise<void> {
+    if (userId) expect(userId).toBeDefined();
+
+    const userRepository = connection.getRepository(User);
+
+    const deletedUser = await userRepository.findOne({
+      where: { id: userId },
+    });
+    expect(deletedUser).toEqual(undefined);
   }
 }
