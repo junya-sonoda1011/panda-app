@@ -10,6 +10,9 @@ const saveUser = [
   {
     password: 'test4321',
   },
+  {
+    password: 'test2341',
+  },
 ];
 
 export const seed = async (connection) => {

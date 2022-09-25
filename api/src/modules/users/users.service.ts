@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { SaveUserDto } from '../../controller/auth/dto/save-user.dto';
 import { User } from '../../models/entities/user.entity';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from '../../controller/users/dto/update-user.dto';
 
@@ -37,16 +37,6 @@ export class UsersService {
     throw new NotFoundException();
   }
 
-  async findById(userId: string): Promise<User> {
-    try {
-      const user = await this.user.findOne({ where: { id: userId } });
-      if (user) return user;
-    } catch (error) {
-      throw new InternalServerErrorException();
-    }
-    throw new NotFoundException();
-  }
-
   async findByName(userName: string): Promise<User> {
     return await this.user.findOne({ where: { name: userName } });
   }
@@ -58,6 +48,16 @@ export class UsersService {
     return await this.user.findOne({
       where: { id: payload.id, name: payload.username },
     });
+  }
+
+  async findById(userId: string): Promise<User> {
+    try {
+      const user = await this.user.findOne({ where: { id: userId } });
+      if (user) return user;
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+    throw new NotFoundException();
   }
 
   async updateCurrentUser(user: User, body: UpdateUserDto): Promise<User> {
@@ -89,6 +89,27 @@ export class UsersService {
         const updateUser = new UserData4Save(body, user);
         return await this.user.save(updateUser.user);
       }
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+    throw new NotFoundException();
+  }
+
+  async deleteCurrentUser(user: User): Promise<DeleteResult> {
+    try {
+      const deleteUser = await this.user.findOne({ where: { id: user.id } });
+      if (deleteUser) return await this.user.delete(deleteUser.id);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+    throw new NotFoundException();
+  }
+
+  async delete(userId: string): Promise<DeleteResult> {
+    try {
+      const deleteUser = await this.user.findOne({ where: { id: userId } });
+
+      if (deleteUser) return await this.user.delete({ id: userId });
     } catch (error) {
       throw new InternalServerErrorException();
     }

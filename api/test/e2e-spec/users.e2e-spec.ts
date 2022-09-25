@@ -11,7 +11,7 @@ import { seed } from '../../src/models/seed/seed';
 import { Connection, getConnection } from 'typeorm';
 import { UserResponse } from '../../src/controller/users/response/find-user.response';
 import { AuthService } from '../../src/modules/auth/auth.service';
-import { UserSaveConfirmation } from '../../test/save-confirmations/user.save-confirmation';
+import { UserTestConfirmation } from '../confirmations/user.test-confirmation';
 
 describe('UsersController', () => {
   let app: INestApplication;
@@ -53,7 +53,7 @@ describe('UsersController', () => {
     await app.close();
   });
 
-  let usersResponseValue;
+  let usersResponseValue: UserResponse[];
 
   const findUsersResponse = (
     numberOfUsers: number,
@@ -96,7 +96,7 @@ describe('UsersController', () => {
         msg: 'ユーザー一覧取得',
         expected: {
           status: 200,
-          data: findUsersResponse(2),
+          data: findUsersResponse(3),
         },
       },
     ];
@@ -195,21 +195,21 @@ describe('UsersController', () => {
 
     const semiNormalCases = [
       {
-        msg: '存在しないユーザーID',
-        id: '10',
-        isValidToken: true,
-        expected: {
-          status: 404,
-          data: notFoundResponse,
-        },
-      },
-      {
         msg: 'accessToken が不正',
         id: '1',
         isValidToken: false,
         expected: {
           status: 401,
           data: unauthorizedResponse,
+        },
+      },
+      {
+        msg: '存在しないユーザーID',
+        id: '10',
+        isValidToken: true,
+        expected: {
+          status: 404,
+          data: notFoundResponse,
         },
       },
     ];
@@ -229,11 +229,6 @@ describe('UsersController', () => {
       },
     );
   });
-
-  const updateUserValue = {
-    first: 'test1',
-    second: 'test2',
-  };
 
   const updateRequestBody = {
     name: 'updateTest1',
@@ -255,7 +250,10 @@ describe('UsersController', () => {
     {
       msg: 'ユーザー情報更新（全項目）',
       id: '2',
-      requestBody: { ...updateRequestBody },
+      requestBody: {
+        ...updateRequestBody,
+        ...{ work: 'updateWork', hobby: 'updateHobby' },
+      },
       expected: {
         status: 200,
         data: updateResponse,
@@ -425,16 +423,17 @@ describe('UsersController', () => {
       '正常系',
       ({ msg, requestBody, expected }) => {
         afterAll(async () => {
-          token = await getToken(requestBody.name, requestBody.password);
+          if (msg == 'ユーザー情報更新（一部の項目）')
+            token = await getToken(requestBody.name, requestBody.password);
         });
         it(msg, async () => {
           await request(app.getHttpServer())
-            .put(`/users/me`)
+            .put('/users/me')
             .set('Authorization', 'Bearer ' + token)
             .send(requestBody)
             .expect(expected.status)
             .expect(expected.data);
-          await UserSaveConfirmation.confirmSave(getConnection(), requestBody);
+          await UserTestConfirmation.confirmSave(getConnection(), requestBody);
         });
       },
     );
@@ -444,7 +443,7 @@ describe('UsersController', () => {
       ({ msg, isValidToken, requestBody, expected }) => {
         it(msg, async () => {
           await request(app.getHttpServer())
-            .put(`/users/me`)
+            .put('/users/me')
             .set(
               'Authorization',
               isValidToken ? 'Bearer ' + token : 'Bearer ' + 'invalidToken',
@@ -458,16 +457,6 @@ describe('UsersController', () => {
   });
 
   describe('PUT /users/:userId', () => {
-    updateSemiNormalCases.unshift({
-      msg: '存在しないユーザーID',
-      id: '10',
-      isValidToken: true,
-      requestBody: updateRequestBody,
-      expected: {
-        status: 404,
-        data: notFoundResponse,
-      },
-    });
     describe.each(updateNormalCases)(
       '正常系',
       ({ msg, id, requestBody, expected }) => {
@@ -479,9 +468,8 @@ describe('UsersController', () => {
           });
         });
         afterAll(async () => {
-          if (msg == 'ユーザー情報更新（全項目）') {
+          if (msg == 'ユーザー情報更新（一部の項目）')
             token = await getToken('updateTest1', 'updateTest1234');
-          }
         });
         it(msg, async () => {
           await request(app.getHttpServer())
@@ -490,7 +478,7 @@ describe('UsersController', () => {
             .send(requestBody)
             .expect(expected.status)
             .expect(expected.data);
-          await UserSaveConfirmation.confirmSave(
+          await UserTestConfirmation.confirmSave(
             getConnection(),
             requestBody,
             id,
@@ -498,6 +486,17 @@ describe('UsersController', () => {
         });
       },
     );
+
+    updateSemiNormalCases.unshift({
+      msg: '存在しないユーザーID',
+      id: '10',
+      isValidToken: true,
+      requestBody: updateRequestBody,
+      expected: {
+        status: 404,
+        data: notFoundResponse,
+      },
+    });
 
     describe.each(updateSemiNormalCases)(
       '準正常系',
@@ -512,6 +511,127 @@ describe('UsersController', () => {
             .send(requestBody)
             .expect(expected.status)
             .expect(expected.data);
+        });
+      },
+    );
+  });
+
+  const deleteResponse = { message: 'ユーザーを削除しました' };
+
+  describe('DELETE /users/:userId', () => {
+    const deleteNormalCases = [
+      {
+        msg: 'ユーザー削除',
+        id: '2',
+        expected: {
+          status: 200,
+          data: deleteResponse,
+        },
+      },
+    ];
+
+    describe.each(deleteNormalCases)('正常系', ({ msg, id, expected }) => {
+      // afterAll(async () => {
+      //   token = await getToken('testUser3', 'test2341');
+      // });
+      it(msg, async () => {
+        await request(app.getHttpServer())
+          .delete(`/users/${id}`)
+          .set('Authorization', 'Bearer ' + token)
+          .expect(expected.status);
+        await UserTestConfirmation.confirmDelete(getConnection(), id);
+      });
+    });
+
+    const deleteSemiNormalCases = [
+      {
+        msg: 'accessToken が不正',
+        id: '1',
+        isValidToken: false,
+        expected: {
+          status: 401,
+          data: unauthorizedResponse,
+        },
+      },
+      {
+        msg: '存在しないユーザーID',
+        id: '10',
+        isValidToken: true,
+        expected: {
+          status: 404,
+          data: notFoundResponse,
+        },
+      },
+    ];
+
+    describe.each(deleteSemiNormalCases)(
+      '準正常系',
+      ({ msg, id, isValidToken, expected }) => {
+        it(msg, async () => {
+          await request(app.getHttpServer())
+            .delete(`/users/${id}`)
+            .set(
+              'Authorization',
+              isValidToken ? 'Bearer ' + token : 'Bearer ' + 'invalidToken',
+            )
+            .expect(expected.status);
+        });
+      },
+    );
+  });
+
+  describe('DELETE /users/me', () => {
+    const deleteNormalCases = [
+      {
+        msg: 'ユーザー削除',
+        id: '1',
+        isValidToken: true,
+        expected: {
+          status: 200,
+          data: deleteResponse,
+        },
+      },
+    ];
+
+    describe.each(deleteNormalCases)(
+      '正常系',
+      ({ msg, id, isValidToken, expected }) => {
+        it(msg, async () => {
+          await request(app.getHttpServer())
+            .delete('/users/me')
+            .set(
+              'Authorization',
+              isValidToken ? 'Bearer ' + token : 'Bearer ' + 'invalidToken',
+            )
+            .expect(expected.status);
+          await UserTestConfirmation.confirmDelete(getConnection(), id);
+        });
+      },
+    );
+
+    const deleteSemiNormalCases = [
+      {
+        msg: 'accessToken が不正',
+        id: '3',
+        isValidToken: false,
+        expected: {
+          status: 401,
+          data: unauthorizedResponse,
+        },
+      },
+    ];
+
+    describe.each(deleteSemiNormalCases)(
+      '準正常系',
+      ({ msg, isValidToken, expected }) => {
+        it(msg, async () => {
+          await request(app.getHttpServer())
+            .delete(`/users/me`)
+            .set(
+              'Authorization',
+              isValidToken ? 'Bearer ' + token : 'Bearer ' + 'invalidToken',
+            )
+            .expect(expected.status);
         });
       },
     );

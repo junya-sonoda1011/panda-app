@@ -8,7 +8,7 @@ import {
   testValidationPipeOptions,
 } from '../test-global.module';
 import { seed } from '../../src/models/seed/seed';
-import { UserSaveConfirmation } from '../../test/save-confirmations/user.save-confirmation';
+import { UserTestConfirmation } from '../confirmations/user.test-confirmation';
 
 describe('AuthController', () => {
   let app: INestApplication;
@@ -69,7 +69,7 @@ describe('AuthController', () => {
           .post('/auth/signup')
           .send(requestBody)
           .expect(expected.status);
-        await UserSaveConfirmation.confirmSave(getConnection(), requestBody);
+        await UserTestConfirmation.confirmSave(getConnection(), requestBody);
       });
     });
 
