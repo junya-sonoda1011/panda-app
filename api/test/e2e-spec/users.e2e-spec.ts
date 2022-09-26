@@ -531,9 +531,6 @@ describe('UsersController', () => {
     ];
 
     describe.each(deleteNormalCases)('正常系', ({ msg, id, expected }) => {
-      // afterAll(async () => {
-      //   token = await getToken('testUser3', 'test2341');
-      // });
       it(msg, async () => {
         await request(app.getHttpServer())
           .delete(`/users/${id}`)
