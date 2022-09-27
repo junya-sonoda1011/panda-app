@@ -17,10 +17,13 @@ export class UsersService {
     private readonly user: Repository<User>,
   ) {}
 
-  async save(body: SaveUserDto): Promise<User> {
+  async save(saveUserDto: SaveUserDto): Promise<User> {
     try {
-      body.password = await bcrypt.hash(body.password, await bcrypt.genSalt());
-      const saveData = new UserData4Save(body);
+      saveUserDto.password = await bcrypt.hash(
+        saveUserDto.password,
+        await bcrypt.genSalt(),
+      );
+      const saveData = new UserData4Save(saveUserDto);
       return await this.user.save(saveData.user);
     } catch (error) {
       throw new InternalServerErrorException();
@@ -60,15 +63,18 @@ export class UsersService {
     throw new NotFoundException();
   }
 
-  async updateCurrentUser(user: User, body: UpdateUserDto): Promise<User> {
+  async updateCurrentUser(
+    user: User,
+    updateUserDto: UpdateUserDto,
+  ): Promise<User> {
     try {
-      if (body.password)
-        body.password = await bcrypt.hash(
-          body.password,
+      if (updateUserDto.password)
+        updateUserDto.password = await bcrypt.hash(
+          updateUserDto.password,
           await bcrypt.genSalt(),
         );
       if (user) {
-        const updateUser = new UserData4Save(body, user);
+        const updateUser = new UserData4Save(updateUserDto, user);
         return await this.user.save(updateUser.user);
       }
     } catch (error) {
@@ -77,16 +83,16 @@ export class UsersService {
     throw new NotFoundException();
   }
 
-  async update(userId: string, body: UpdateUserDto): Promise<User> {
+  async update(userId: string, updateUserDto: UpdateUserDto): Promise<User> {
     try {
-      if (body.password)
-        body.password = await bcrypt.hash(
-          body.password,
+      if (updateUserDto.password)
+        updateUserDto.password = await bcrypt.hash(
+          updateUserDto.password,
           await bcrypt.genSalt(),
         );
       const user = await this.user.findOne({ where: { id: userId } });
       if (user) {
-        const updateUser = new UserData4Save(body, user);
+        const updateUser = new UserData4Save(updateUserDto, user);
         return await this.user.save(updateUser.user);
       }
     } catch (error) {
