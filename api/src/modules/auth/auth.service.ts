@@ -7,6 +7,7 @@ import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { AuthDto } from '../../controller/auth/dto/auth.dto';
+import { SaveUserDto } from '../../../src/controller/auth/dto/save-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -15,9 +16,9 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signUp(body): Promise<{ accessToken: string }> {
+  async signup(saveUserDto: SaveUserDto): Promise<{ accessToken: string }> {
     try {
-      const user = await this.usersService.save(body);
+      const user = await this.usersService.save(saveUserDto);
       if (user) {
         const payload = { id: user.id, userName: user.name };
         const accessToken = await this.jwtService.sign(payload);

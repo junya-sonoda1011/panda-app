@@ -11,9 +11,9 @@ export class AuthController {
   @Post('signup')
   @UseFilters(new AuthCtrExceptionFilter())
   async signup(
-    @Body() saveUSerDto: SaveUserDto,
+    @Body() saveUserDto: SaveUserDto,
   ): Promise<{ accessToken: string }> {
-    return await this.authService.signUp(saveUSerDto);
+    return await this.authService.signup(saveUserDto);
   }
 
   @Post('login')
